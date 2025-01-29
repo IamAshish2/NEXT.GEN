@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MinimalAPIConcepts.Context;
-using MinimalAPIConcepts.Interfaces;
 using MinimalAPIConcepts.Models;
+using MinimalAPIConcepts.Services.Interfaces;
 
-namespace MinimalAPIConcepts.Repository
+namespace MinimalAPIConcepts.Services.Repository
 {
     public class UserRepository : IUserRepository
     {
@@ -23,10 +23,10 @@ namespace MinimalAPIConcepts.Repository
         public async Task<bool> DeleteUserAsync(Guid userId)
         {
             User user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
-            if(user != null)
+            if (user != null)
             {
 
-            _context.Users.Remove(user);
+                _context.Users.Remove(user);
             }
             return await SaveAsync();
         }
@@ -49,9 +49,9 @@ namespace MinimalAPIConcepts.Repository
         public async Task<bool> UpdateUserAsync(Guid userId, User user)
         {
             User findUser = await GetUserByIdAsync(userId);
-            if(findUser != null)
+            if (findUser != null)
             {
-                 _context.Users.Update(user);
+                _context.Users.Update(user);
             }
             return await SaveAsync();
         }

@@ -1,21 +1,21 @@
 ﻿using MinimalAPIConcepts.Models;
 
-namespace MinimalAPIConcepts.Interfaces
+namespace MinimalAPIConcepts.Services.Interfaces
 {
     public interface IUserRepository
     {
         // Read Operations
-        Task<IEnumerable<User>> GetUsersAsync(); 
-        Task<User> GetUserByIdAsync(Guid userId); 
+        Task<IEnumerable<User>> GetUsersAsync();
+        Task<User> GetUserByIdAsync(Guid userId);
 
         // Create Operation
-        Task<bool> CreateUserAsync(User newUser); 
+        Task<bool> CreateUserAsync(User newUser);
 
         // Update Operation
-        Task<bool> UpdateUserAsync(Guid userId, User user); 
+        Task<bool> UpdateUserAsync(Guid userId, User user);
 
         // Delete Operation
-        Task<bool> DeleteUserAsync(Guid userId); 
+        Task<bool> DeleteUserAsync(Guid userId);
 
         // Existence Check
         Task<bool> EmailExists(string Email);
@@ -23,6 +23,6 @@ namespace MinimalAPIConcepts.Interfaces
         Task<bool> checkIfUserExists(Guid userId);
 
         // Save Changes
-        Task<bool> SaveAsync(); 
+        Task<bool> SaveAsync();
     }
 }

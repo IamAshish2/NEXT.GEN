@@ -1,12 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace MinimalAPIConcepts.Models
+namespace MinimalAPIConcepts.Dtos
 {
-    public class User
+    public class LoginUserDto
     {
-        [Key]
-        public Guid Id { get; set; }
-
         [Required]
         public string UserName { get; set; }
 
@@ -15,6 +12,6 @@ namespace MinimalAPIConcepts.Models
 
         [Required]
         public string Password { get; set; }
-
     }
+
 }
