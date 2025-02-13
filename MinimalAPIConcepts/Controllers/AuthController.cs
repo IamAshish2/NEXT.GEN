@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using MinimalAPIConcepts.Context;
-using MinimalAPIConcepts.Dtos;
+using MinimalAPIConcepts.Dtos.UserDto;
 using MinimalAPIConcepts.Models;
 using MinimalAPIConcepts.Services.Interfaces;
 using System.IdentityModel.Tokens.Jwt;

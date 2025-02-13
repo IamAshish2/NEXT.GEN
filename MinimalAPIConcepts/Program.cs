@@ -10,6 +10,9 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Add auto mapper configuration
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
 // Add Jwt configuration
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
 
