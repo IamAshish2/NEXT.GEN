@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore.Query;
 using MinimalAPIConcepts.Dtos.UserDto;
 using MinimalAPIConcepts.Models;
 using MinimalAPIConcepts.Services.Interfaces;
+using NEXT.GEN.Dtos.UserDto;
+using NEXT.GEN.Models;
 
 namespace MinimalAPIConcepts.Controllers
 {
@@ -14,16 +16,19 @@ namespace MinimalAPIConcepts.Controllers
     {
         private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
+        private readonly ILogger<User> _logger;
 
-        public UserController(IUserRepository userRepository, IMapper mapper)
+        public UserController(IUserRepository userRepository, IMapper mapper, ILogger<User> logger)
         {
             _userRepository = userRepository;
             _mapper = mapper;
+            _logger = logger;
         }
 
         [HttpGet]
         [ProducesResponseType(200, Type = typeof(IEnumerable<User>))]
-        [ProducesResponseType(500)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(500,Type = typeof(ErrorResponse))]
         public async Task<IActionResult> GetUsers()
         {
             try
@@ -38,34 +43,34 @@ namespace MinimalAPIConcepts.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, ex);
+                return StatusCode(500, new ErrorResponse { ErrorCode = "ERROR",Message="Server Error! Please try again later."});
             }
         }
 
         [HttpGet("{userId}")]
-        [ProducesResponseType(200, Type = typeof(User))]
+        [ProducesResponseType(200, Type = typeof(GetUserDto))] 
         [ProducesResponseType(404)]
-        public async Task<IActionResult> GetUserById(Guid userId)
+        [ProducesResponseType(500, Type = typeof(ErrorResponse))] 
+        public async Task<ActionResult<GetUserDto>> GetUserById(Guid userId)
         {
             try
             {
                 var user = await _userRepository.GetUserByIdAsync(userId);
 
-                if (user == null) // Check if the user is null
+                if (user == null)
                 {
-                    return NotFound("User not found!");
+                    return NotFound(new ErrorResponse { ErrorCode = "USER_NOT_FOUND", Message = "User not found." }); 
                 }
 
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
+                var mappedUser = _mapper.Map<GetUserDto>(user);
 
-                return Ok(user); // Return OK response with the user data
+                return Ok(mappedUser);
+
             }
-            catch (Exception ex)
+            catch (Exception ex) 
             {
-                return StatusCode(500, $"Server Error: {ex.Message}");
+                _logger.LogError(ex, "Error retrieving user: {userId}", userId); 
+                return StatusCode(500, new ErrorResponse { ErrorCode = "INTERNAL_SERVER_ERROR", Message = "An unexpected error occurred." });
             }
         }
 
@@ -73,14 +78,15 @@ namespace MinimalAPIConcepts.Controllers
         [HttpPost]
         [ProducesResponseType(201)]
         [ProducesResponseType(500)]
-        public async Task<IActionResult> CreateUser([FromBody] User user)
+        public async Task<IActionResult> CreateUser([FromBody] CreateUserDto user)
         {
             try
             {
                 if (user == null) return BadRequest(ModelState);
 
-                var userAlreadyExists = await _userRepository.EmailExists(user.Email);
-                if (userAlreadyExists)
+                var emailInUse = await _userRepository.isEmailInUse(user.Email);
+                var userNameInUse = await _userRepository.isUserNameInUse(user.UserName);
+                if (emailInUse || userNameInUse)
                 {
                     return BadRequest("User Already exists");
                 }
@@ -90,7 +96,13 @@ namespace MinimalAPIConcepts.Controllers
                     return BadRequest(ModelState);
                 }
 
-                var newUser = await _userRepository.CreateUserAsync(user);
+                var hashedPassword = BCrypt.Net.BCrypt.HashPassword(user.Password);
+                _logger.LogInformation("The users hashed password is " , hashedPassword);
+                user.Password = hashedPassword;
+
+                var mappedUser = _mapper.Map<User>(user);
+
+                var newUser = await _userRepository.CreateUserAsync(mappedUser);
                 if (!newUser)
                 {
                     return BadRequest();
@@ -101,14 +113,16 @@ namespace MinimalAPIConcepts.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, "Error " + ex);
+                _logger.LogInformation("Error occured while creating a new user. Error is " + ex.Message);
+                return StatusCode(500, new ErrorResponse { ErrorCode = "INTERNAL_SERVER_ERROR", Message = "An unexpected error occurred." });
             }
         }
 
         [HttpPut("{Id}")]
-        [ProducesResponseType(200)]
+        [ProducesResponseType(201)]
+        [ProducesResponseType(404)]
         [ProducesResponseType(500)]
-        public async Task<IActionResult> UpdateUser([FromBody] UpdateUserDto updatedUser, Guid Id)
+        public async Task<IActionResult> UpdateUser(Guid Id, [FromBody] UpdateUserDto updatedUser)
         {
             if(!ModelState.IsValid)  return BadRequest(ModelState);
 
@@ -134,7 +148,7 @@ namespace MinimalAPIConcepts.Controllers
         
         public async Task<IActionResult> DeleteUser(Guid Id)
         {
-            var findUser = _userRepository.GetUserByIdAsync(Id);
+            var findUser = await _userRepository.GetUserByIdAsync(Id);
             if (findUser == null)
             {
                 return NotFound();

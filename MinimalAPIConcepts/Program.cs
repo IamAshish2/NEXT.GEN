@@ -44,10 +44,11 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 // Register controllers
-builder.Services.AddControllers().AddJsonOptions(options =>
-{
-    options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
-});
+builder.Services.AddControllers();
+//.AddJsonOptions(options =>
+//{
+//    options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
+//});
 
 // Database connection
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(
@@ -64,7 +65,7 @@ var app = builder.Build();
 
 app.UseHttpsRedirection();
 app.UseAuthentication();
-app.UseAuthorization();
+//app.UseAuthorization();
 
 // Map controllers
 app.MapControllers();

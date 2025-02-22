@@ -36,9 +36,9 @@ namespace MinimalAPIConcepts.Services.Repository
             return await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
         }
 
-        public async Task<IEnumerable<User>> GetUsersAsync()
+        public async Task<ICollection<User>> GetUsersAsync()
         {
-            return await _context.Users.ToListAsync();
+            return await _context.Users.OrderBy(u => u.Id).ToListAsync();
         }
 
         public async Task<bool> SaveAsync()
@@ -56,12 +56,17 @@ namespace MinimalAPIConcepts.Services.Repository
             return await SaveAsync();
         }
 
-        public async Task<bool> EmailExists(string Email)
+        public async Task<bool> isEmailInUse(string Email)
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == Email);
             return user == null ? false : true;
         }
 
+        public async Task<bool> isUserNameInUse(string userName)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.UserName == userName);
+            return user == null ? false : true;
+        }
         public async Task<bool> checkIfUserExists(Guid userId)
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);

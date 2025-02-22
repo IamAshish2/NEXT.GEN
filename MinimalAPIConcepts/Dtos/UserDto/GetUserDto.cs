@@ -1,11 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace MinimalAPIConcepts.Dtos.UserDto
+namespace NEXT.GEN.Dtos.UserDto
 {
-    public class CreateUserDto
+    public class GetUserDto
     {
+        public Guid Id { get; set; }
         public string? UserName { get; set; }
         public string? Email { get; set; }
-        public string Password { get; set; } = string.Empty!;
     }
 }

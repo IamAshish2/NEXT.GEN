@@ -9,8 +9,11 @@ namespace MinimalAPIConcepts.Helper
         public ProfileMapper()
         {
             CreateMap<User,CreateUserDto>();
+            CreateMap<CreateUserDto,User>();
             CreateMap<User,UpdateUserDto>();
+            CreateMap<UpdateUserDto,User>();
             CreateMap<User,LoginUserDto>();
+            CreateMap<LoginUserDto,User>();
         }
     }
 }

@@ -21,6 +21,7 @@ namespace MinimalAPIConcepts.Services.Repository
         {
             var claims = new[]
             {
+                new Claim(JwtRegisteredClaimNames.Sub, userName),
                 new Claim(ClaimTypes.Email,Email),
                 new Claim(ClaimTypes.Name,userName)
             };
