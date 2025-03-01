@@ -1,14 +1,10 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 using MinimalAPIConcepts.Context;
 using MinimalAPIConcepts.Dtos.UserDto;
-using MinimalAPIConcepts.Models;
 using MinimalAPIConcepts.Services.Interfaces;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
+using NEXT.GEN.Dtos.UserDto;
+using NEXT.GEN.Models;
 
 namespace MinimalAPIConcepts.Controllers
 {
@@ -26,24 +22,59 @@ namespace MinimalAPIConcepts.Controllers
             _tokenGenerator = tokenGenerator;
         }
 
-        [HttpPost]
-        public IActionResult Login([FromBody] LoginUserDto newUser)
+        [HttpGet]
+        [Authorize]
+        // This endpoint can only be hit by the authorized user i.e. admin in this case. 
+        // so, if the endpoint returns 200 ok , the user is authorized
+        // else the user is not authorized.
+        public IActionResult verifyToken()
         {
-            if(!ModelState.IsValid) return BadRequest(ModelState);
-
-            var user = _context.Users
-                      .FirstOrDefault(u => u.Email == newUser.Email && u.Password == newUser.Password && u.UserName == newUser.UserName);
-
-            if (user == null)
-            {
-                return Unauthorized();
-            }
-
-            var token = _tokenGenerator.GenerateToken(newUser.UserName,newUser.Email);
-            return Ok(new { token });
+            return Ok(new { message = "user Authorized" });
         }
 
 
-      
+        [HttpPost("login")] 
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400, Type = typeof(ErrorResponse))] 
+        [ProducesResponseType(401, Type = typeof(ErrorResponse))] 
+        public IActionResult Login([FromBody] LoginUserDto loginUser)
+        {
+
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(new ErrorResponse { ErrorCode = "INVALID_INPUT", Message = "Invalid input data." });
+                }
+
+                var user = _context.Users.FirstOrDefault(u => u.Email == loginUser.Email && u.UserName == loginUser.UserName);
+
+                if (user == null)
+                {
+                    return Unauthorized(new ErrorResponse { ErrorCode = "USER_NOT_FOUND", Message = "User not found." });
+                }
+
+                var checkPassword = BCrypt.Net.BCrypt.Verify(loginUser.Password, user.Password);
+
+                if (!checkPassword)
+                {
+                    return Unauthorized(new ErrorResponse { ErrorCode = "INVALID_CREDENTIALS", Message = "Invalid credentials." });
+                }
+
+                var token = _tokenGenerator.GenerateToken(loginUser.UserName, loginUser.Email);
+
+                var response = new LoginResponseDto
+                {
+                    Token = token
+                };
+
+                return Ok(response);
+            }
+            catch (Exception Error)
+            {
+
+                return BadRequest(Error.Message);
+            }
+        }
     }
 }

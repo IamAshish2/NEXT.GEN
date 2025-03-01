@@ -13,6 +13,12 @@ var builder = WebApplication.CreateBuilder(args);
 // Add auto mapper configuration
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
+// adding the cors policy for all origins default.
+builder.Services.AddCors( options => 
+            options.AddPolicy("AllowAllOrigins",
+            builder => builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod())            
+);
+
 // Add Jwt configuration
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
 
@@ -44,10 +50,11 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 // Register controllers
-builder.Services.AddControllers().AddJsonOptions(options =>
-{
-    options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
-});
+builder.Services.AddControllers();
+//.AddJsonOptions(options =>
+//{
+//    options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
+//});
 
 // Database connection
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(
@@ -62,9 +69,10 @@ builder.Services.AddScoped<ITokenGenerator,TokenGenerator>();
 
 var app = builder.Build();
 
+app.UseCors("AllowAnyOrigins");
 app.UseHttpsRedirection();
 app.UseAuthentication();
-app.UseAuthorization();
+//app.UseAuthorization();
 
 // Map controllers
 app.MapControllers();
