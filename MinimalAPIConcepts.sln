@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.12.35527.113
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MinimalAPIConcepts", "MinimalAPIConcepts\MinimalAPIConcepts.csproj", "{C15006E0-CE6E-4F90-A5CB-5FDB936A97B5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NEXT.GEN", "MinimalAPIConcepts\NEXT.GEN.csproj", "{C15006E0-CE6E-4F90-A5CB-5FDB936A97B5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

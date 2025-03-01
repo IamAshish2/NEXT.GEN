@@ -20,7 +20,7 @@ namespace MinimalAPIConcepts.Services.Repository
             return await SaveAsync();
         }
 
-        public async Task<bool> DeleteUserAsync(Guid userId)
+        public async Task<bool> DeleteUserAsync(int userId)
         {
             User user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
             if (user != null)
@@ -31,7 +31,7 @@ namespace MinimalAPIConcepts.Services.Repository
             return await SaveAsync();
         }
 
-        public async Task<User> GetUserByIdAsync(Guid userId)
+        public async Task<User> GetUserByIdAsync(int userId)
         {
             return await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
         }
@@ -46,13 +46,9 @@ namespace MinimalAPIConcepts.Services.Repository
             return await _context.SaveChangesAsync() > 0;
         }
 
-        public async Task<bool> UpdateUserAsync(Guid userId, User user)
+        public async Task<bool> UpdateUserAsync(User user)
         {
-            User findUser = await GetUserByIdAsync(userId);
-            if (findUser != null)
-            {
-                _context.Users.Update(user);
-            }
+            _context.Update(user);
             return await SaveAsync();
         }
 
@@ -67,7 +63,7 @@ namespace MinimalAPIConcepts.Services.Repository
             var user = await _context.Users.FirstOrDefaultAsync(u => u.UserName == userName);
             return user == null ? false : true;
         }
-        public async Task<bool> checkIfUserExists(Guid userId)
+        public async Task<bool> checkIfUserExists(int userId)
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
             return user == null ? false : true;

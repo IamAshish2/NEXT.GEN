@@ -1,17 +1,18 @@
 ﻿using MinimalAPIConcepts.Models;
+using NEXT.GEN.Dtos.UserDto;
 
 namespace MinimalAPIConcepts.Services.Interfaces
 {
     public interface IUserRepository
     {
         Task<ICollection<User>> GetUsersAsync();
-        Task<User> GetUserByIdAsync(Guid userId);
+        Task<User> GetUserByIdAsync(int userId);
         Task<bool> CreateUserAsync(User newUser);
-        Task<bool> UpdateUserAsync(Guid userId, User user);
-        Task<bool> DeleteUserAsync(Guid userId);
+        Task<bool> UpdateUserAsync(User user);
+        Task<bool> DeleteUserAsync(int userId);
         Task<bool> isEmailInUse(string Email);
         Task<bool> isUserNameInUse(string userName);
-        Task<bool> checkIfUserExists(Guid userId);
+        Task<bool> checkIfUserExists(int userId);
         Task<bool> SaveAsync();
     }
 }

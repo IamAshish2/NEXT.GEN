@@ -13,6 +13,12 @@ var builder = WebApplication.CreateBuilder(args);
 // Add auto mapper configuration
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
+// adding the cors policy for all origins default.
+builder.Services.AddCors( options => 
+            options.AddPolicy("AllowAllOrigins",
+            builder => builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod())            
+);
+
 // Add Jwt configuration
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
 
@@ -63,6 +69,7 @@ builder.Services.AddScoped<ITokenGenerator,TokenGenerator>();
 
 var app = builder.Build();
 
+app.UseCors("AllowAnyOrigins");
 app.UseHttpsRedirection();
 app.UseAuthentication();
 //app.UseAuthorization();

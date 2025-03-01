@@ -1,7 +1,5 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Query;
 using MinimalAPIConcepts.Dtos.UserDto;
 using MinimalAPIConcepts.Models;
 using MinimalAPIConcepts.Services.Interfaces;
@@ -26,7 +24,7 @@ namespace MinimalAPIConcepts.Controllers
         }
 
         [HttpGet]
-        [ProducesResponseType(200, Type = typeof(IEnumerable<User>))]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<GetUserDto>))]
         [ProducesResponseType(404)]
         [ProducesResponseType(500,Type = typeof(ErrorResponse))]
         public async Task<IActionResult> GetUsers()
@@ -38,12 +36,12 @@ namespace MinimalAPIConcepts.Controllers
                 {
                     return NotFound();
                 }
-                if (!ModelState.IsValid) return BadRequest(ModelState);
-                return Ok(users);
+                var mappedUsers = _mapper.Map<List<GetUserDto>> (users);
+                return Ok(mappedUsers);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new ErrorResponse { ErrorCode = "ERROR",Message="Server Error! Please try again later."});
+                return StatusCode(500, new ErrorResponse { ErrorCode = "ERROR",Message=ex.Message});
             }
         }
 
@@ -51,7 +49,7 @@ namespace MinimalAPIConcepts.Controllers
         [ProducesResponseType(200, Type = typeof(GetUserDto))] 
         [ProducesResponseType(404)]
         [ProducesResponseType(500, Type = typeof(ErrorResponse))] 
-        public async Task<ActionResult<GetUserDto>> GetUserById(Guid userId)
+        public async Task<ActionResult<GetUserDto>> GetUserById(int userId)
         {
             try
             {
@@ -122,18 +120,25 @@ namespace MinimalAPIConcepts.Controllers
         [ProducesResponseType(201)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
-        public async Task<IActionResult> UpdateUser(Guid Id, [FromBody] UpdateUserDto updatedUser)
+        public async Task<IActionResult> UpdateUser(int Id, [FromBody] UpdateUserDto updatedUser)
         {
             if(!ModelState.IsValid)  return BadRequest(ModelState);
 
+            if (Id != updatedUser.Id) return BadRequest();
+
             var userExists = await _userRepository.checkIfUserExists(Id);
-            if (!userExists){
+            if (!userExists)
+            {
                 return NotFound();
             }
 
-            var userMap = _mapper.Map<User>(updatedUser);
+            var existingUser = await _userRepository.GetUserByIdAsync(Id);
+            existingUser.UserName = updatedUser.UserName;
+            existingUser.Email = updatedUser.Email;
 
-            bool success = await _userRepository.UpdateUserAsync(Id,userMap);
+            //var mappedUser = _mapper.Map<User>(updatedUser);
+
+            bool success = await _userRepository.UpdateUserAsync(existingUser);
             if (!success)
             {
                 ModelState.AddModelError("", "Unsuccessful operation. Try again!");
@@ -142,11 +147,11 @@ namespace MinimalAPIConcepts.Controllers
             return NoContent();
         }
 
-        [HttpDelete("deleteUser")]
+        [HttpDelete("deleteUser/{userIdDelete}")]
         [ProducesResponseType(200)]
         [ProducesResponseType(500)]
         
-        public async Task<IActionResult> DeleteUser(Guid Id)
+        public async Task<IActionResult> DeleteUser(int Id)
         {
             var findUser = await _userRepository.GetUserByIdAsync(Id);
             if (findUser == null)
@@ -163,7 +168,5 @@ namespace MinimalAPIConcepts.Controllers
 
             return Ok("Success deletion");
         }
-
-
     }
 }
