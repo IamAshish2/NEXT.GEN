@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using MinimalAPIConcepts.Context;
 using MinimalAPIConcepts.Dtos.UserDto;
 using MinimalAPIConcepts.Services.Interfaces;
@@ -23,7 +24,7 @@ namespace MinimalAPIConcepts.Controllers
         }
 
         [HttpGet]
-        [Authorize]
+        //[Authorize]
         // This endpoint can only be hit by the authorized user i.e. admin in this case. 
         // so, if the endpoint returns 200 ok , the user is authorized
         // else the user is not authorized.
@@ -37,7 +38,7 @@ namespace MinimalAPIConcepts.Controllers
         [ProducesResponseType(200)]
         [ProducesResponseType(400, Type = typeof(ErrorResponse))] 
         [ProducesResponseType(401, Type = typeof(ErrorResponse))] 
-        public IActionResult Login([FromBody] LoginUserDto loginUser)
+        public async Task<IActionResult> Login([FromBody] LoginUserDto loginUser)
         {
 
             try
@@ -47,7 +48,7 @@ namespace MinimalAPIConcepts.Controllers
                     return BadRequest(new ErrorResponse { ErrorCode = "INVALID_INPUT", Message = "Invalid input data." });
                 }
 
-                var user = _context.Users.FirstOrDefault(u => u.Email == loginUser.Email && u.UserName == loginUser.UserName);
+                var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == loginUser.Email && u.UserName == loginUser.UserName);
 
                 if (user == null)
                 {

@@ -6,12 +6,27 @@ using MinimalAPIConcepts.Context;
 using MinimalAPIConcepts.Models;
 using MinimalAPIConcepts.Services.Interfaces;
 using MinimalAPIConcepts.Services.Repository;
+using NEXT.GEN.Models.EmailModel;
+using NEXT.GEN.Services.Interfaces;
+using NEXT.GEN.Services.Repository;
+using System.Net;
+using System.Net.Mail;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add auto mapper configuration
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+// Add fluent email service to the application
+var smtp = builder.Configuration.GetSection("Smtp").Get<SmtpSettings>();
+builder.Services.AddFluentEmail(smtp.FromEmail,smtp.FromName)
+    .AddSmtpSender(new SmtpClient(smtp.Host)
+    {
+        Port = smtp.Port,
+        Credentials =  new NetworkCredential(smtp.FromEmail,smtp.Password),
+        EnableSsl = smtp.EnableSsl,
+    });
 
 // adding the cors policy for all origins default.
 builder.Services.AddCors( options => 
@@ -64,12 +79,18 @@ builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlSer
 // Dependency injection for repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ITokenGenerator,TokenGenerator>();
+builder.Services.AddScoped<IEmailService,EmailService>();
+builder.Services.AddScoped<IFriendshipsRepository,FriendshipRepository>();
+builder.Services.AddScoped<IpostRepository, PostRepository>();
+builder.Services.AddScoped<IGroupRepository,GroupRepository>();
+builder.Services.AddScoped<IpostRepository,PostRepository>();
+builder.Services.AddScoped<IGroupMemberRepository,GroupMemberRepository>();
 
 
 
 var app = builder.Build();
 
-app.UseCors("AllowAnyOrigins");
+app.UseCors("AllowAllOrigins");
 app.UseHttpsRedirection();
 app.UseAuthentication();
 //app.UseAuthorization();
