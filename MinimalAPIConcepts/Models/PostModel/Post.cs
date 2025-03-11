@@ -27,3 +27,12 @@ namespace NEXT.GEN.Models.PostModel
         public ICollection<Comment> Comment { get; set; } = new List<Comment>();
     }
 }
+
+/*
+ * createPost(int userId, [FromBody] CreatePostDto] -> post
+ * updatePost(int postId, [FromBody] updatedPostDto] -> put
+ * deletePost (int postId)
+ * getAllUsersPost(int userId)
+ * 
+ * when i click on some user's profile, how will i render their data and their posts? -> getPostByName(string userName) ?
+ */

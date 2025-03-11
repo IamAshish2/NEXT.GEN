@@ -1,6 +1,7 @@
 ﻿using MinimalAPIConcepts.Models;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace NEXT.GEN.Models
 {
@@ -12,8 +13,11 @@ namespace NEXT.GEN.Models
         public int UserId { get; set; }
         [ForeignKey("UserId")]
         public User User { get; set; }
-        public int GroupId {  get; set; }
-        [ForeignKey("GroupId")]
+        //public int GroupId {  get; set; }
+        // make groupName the foreign key 
+        public string GroupName { get; set; }
+        [ForeignKey("GroupName")]
+        [JsonIgnore]
         public Group Group { get; set; }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.Identity.Client;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Identity.Client;
 using MinimalAPIConcepts.Models;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -7,6 +8,7 @@ namespace NEXT.GEN.Models
 {
     // this table represents the friends the user can have
     // the intermediate table between users and users | one user can have many friends who are other users (self refrencing relationship)
+    [Index(nameof(UserId), nameof(FriendId), IsUnique = true)]
     public class Friendships
     {
         [Key]
@@ -21,7 +23,7 @@ namespace NEXT.GEN.Models
         public int FriendId { get; set; }
         [ForeignKey("FriendId")]
         // navigation property for the second user
-        public User Friend { get; set; }
+        public User Friend { get; set; }    
         public DateTime FriendshipDate { get; set; }
     }
 }
