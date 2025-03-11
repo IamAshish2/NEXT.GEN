@@ -23,7 +23,7 @@ namespace MinimalAPIConcepts.Controllers
             _logger = logger;
         }
 
-        [HttpGet]
+        [HttpGet("get-all-users")]
         [ProducesResponseType(200, Type = typeof(IEnumerable<GetUserDto>))]
         [ProducesResponseType(404)]
         [ProducesResponseType(500,Type = typeof(ErrorResponse))]
@@ -45,7 +45,7 @@ namespace MinimalAPIConcepts.Controllers
             }
         }
 
-        [HttpGet("{userId}")]
+        [HttpGet("get-user-by-id/{userId}")]
         [ProducesResponseType(200, Type = typeof(GetUserDto))] 
         [ProducesResponseType(404)]
         [ProducesResponseType(500, Type = typeof(ErrorResponse))] 
@@ -73,7 +73,7 @@ namespace MinimalAPIConcepts.Controllers
         }
 
 
-        [HttpPost]
+        [HttpPost("create-user")]
         [ProducesResponseType(201)]
         [ProducesResponseType(500)]
         public async Task<IActionResult> CreateUser([FromBody] CreateUserDto user)
@@ -116,7 +116,7 @@ namespace MinimalAPIConcepts.Controllers
             }
         }
 
-        [HttpPut("{Id}")]
+        [HttpPut("update-user/{Id}")]
         [ProducesResponseType(201)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
@@ -151,15 +151,15 @@ namespace MinimalAPIConcepts.Controllers
         [ProducesResponseType(200)]
         [ProducesResponseType(500)]
         
-        public async Task<IActionResult> DeleteUser(int Id)
+        public async Task<IActionResult> DeleteUser(int userIdDelete)
         {
-            var findUser = await _userRepository.GetUserByIdAsync(Id);
+            var findUser = await _userRepository.GetUserByIdAsync(userIdDelete);
             if (findUser == null)
             {
                 return NotFound();
             }
 
-            bool success = await _userRepository.DeleteUserAsync(Id);
+            bool success = await _userRepository.DeleteUserAsync(userIdDelete);
             if (!success)
             {
                 ModelState.AddModelError("","An error occured while deleting the user");
