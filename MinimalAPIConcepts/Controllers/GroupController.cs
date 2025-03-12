@@ -96,6 +96,8 @@ namespace NEXT.GEN.Controllers
                     Members = new List<GroupMembers> { new GroupMembers { UserId = createGroupDto.CreatorId} }
                 };
 
+                group.MemberCount++;
+
                 var created = await _groupRepository.CreateGroup(group);
                 if (!created)
                     return StatusCode(500, "Something went wrong while creating the group.");
