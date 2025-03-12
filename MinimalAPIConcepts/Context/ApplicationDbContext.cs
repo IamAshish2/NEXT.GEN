@@ -17,6 +17,9 @@ namespace MinimalAPIConcepts.Context
         public DbSet<Group> Groups { get; set; }
         public DbSet<GroupMembers> GroupMembers { get; set; }
         public DbSet<Post> Posts { get; set; }
+        public DbSet<Likes> Likes { get; set; } 
+        public DbSet<Comment> Comments { get; set; }
+        public DbSet<Dislike> Dislikes { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

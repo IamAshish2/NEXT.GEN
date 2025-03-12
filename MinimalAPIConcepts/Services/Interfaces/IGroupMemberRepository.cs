@@ -5,12 +5,11 @@ namespace NEXT.GEN.Services.Interfaces
 {
     public interface IGroupMemberRepository
     {
-        Task<bool> AddMember(GroupMembers groupMembers);
+        Task<bool> JoinGroup(GroupMembers groupMembers);
         Task<bool> RemoveMember(GroupMembers groupMember);
         // get all the groupMembers
-        Task<List<GroupMembers>> GetGroupMembers(string groupName);
+        Task<List<GetGroupMembersDTO>> GetGroupMembers(string groupName);
         Task<bool> Save();
-
 
         //  group focused
         //Task<bool> GroupExists(int groupId);

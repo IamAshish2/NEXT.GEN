@@ -2,6 +2,7 @@
 using MinimalAPIConcepts.Context;
 using MinimalAPIConcepts.Models;
 using NEXT.GEN.Dtos.GroupMembersDto;
+using NEXT.GEN.Dtos.UserDto;
 using NEXT.GEN.Models;
 using NEXT.GEN.Services.Interfaces;
 
@@ -17,7 +18,7 @@ namespace NEXT.GEN.Services.Repository
         }
 
         // this is the joinGroup 
-        public async Task<bool> AddMember(GroupMembers groupMembers)
+        public async Task<bool> JoinGroup(GroupMembers groupMembers)
         {
             await _context.GroupMembers.AddAsync(groupMembers);
             return await Save();
@@ -28,18 +29,32 @@ namespace NEXT.GEN.Services.Repository
          *  -----------------------------------------------------------------------
          *  make this method take the groupName, which you should make unique and get the groupmembers via groupName instead, that will be easier to do.
          */
-        public async Task<List<GroupMembers>> GetGroupMembers(string groupName)
+        public async Task<List<GetGroupMembersDTO>> GetGroupMembers(string groupName)
         {
             return await _context.GroupMembers.OrderBy(gm => gm.GroupMemberId)
                 .Include(g => g.User)
-                .Where(g => g.Group.GroupName == groupName).ToListAsync();
+                .Where(g => g.Group.GroupName == groupName)
+                .Select(g => new GetGroupMembersDTO
+                {
+                    JoinDate = g.JoinDate,
+                    UserId = g.UserId,
+                    GroupName = g.Group.GroupName,
+                    User = new GetUserDto
+                    {
+                        Id = g.User.Id,
+                        UserName = g.User.UserName,
+                        Email = g.User.Email,
+                    }
+                }).ToListAsync();
+        }
+
+                  
 
             //var group = await _context.Groups
             //.Include(g => g.Members)
             //.ThenInclude(gm => gm.User)
             //.FirstOrDefaultAsync(g => g.GroupId == groupId);
-            //return group;
-        }
+            //return group
 
         // this is the Leave group
 
@@ -74,7 +89,7 @@ namespace NEXT.GEN.Services.Repository
         public async Task<bool> IsUserAlreadyAMember(int userId,string groupName)
         {
             var userExists = await _context.GroupMembers.FirstOrDefaultAsync(g => g.UserId == userId && g.GroupName == groupName);
-            return userExists != null;
+            return userExists == null;
         }
     }
 
