@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using NEXT.GEN.Dtos.PostDto;
 using NEXT.GEN.Models.PostModel;
 using NEXT.GEN.Services.Interfaces;
 
@@ -18,8 +19,7 @@ namespace NEXT.GEN.Controllers
             _mapper = mapper;
         }
 
-        // GET: api/post
-        [HttpGet]
+        [HttpGet("get-all-posts")]
         public async Task<IActionResult> GetAllPosts()
         {
             try
@@ -33,9 +33,9 @@ namespace NEXT.GEN.Controllers
             }
         }
 
-        // GET: api/post/user/{userId}
-        [HttpGet("user/{userId}")]
+        [HttpGet("get-user/{userId}")]
         public async Task<IActionResult> GetPostsByUser(int userId)
+
         {
             try
             {
@@ -51,20 +51,24 @@ namespace NEXT.GEN.Controllers
             }
         }
 
-        // POST: api/post
-        [HttpPost]
-        public async Task<IActionResult> CreatePost([FromBody] Post newPost)
+        [HttpPost("create-post")]
+        public async Task<IActionResult> CreatePost([FromBody] CreatePostDto newPost)
         {
             try
             {
                 if (newPost == null)
                     return BadRequest("Post data is required.");
 
-                var success = await _postRepository.CreatePost(newPost);
-                if (!success)
+                if (!newPost.UserId.HasValue)
+                    return BadRequest("The user id was not found.");
+
+                var mappedPost = _mapper.Map<CreatePost>(newPost);
+                mappedPost.PostedDate = DateTime.UtcNow;
+                
+                if (!await _postRepository.CreatePost(mappedPost))
                     return StatusCode(500, "An error occurred while creating the post.");
 
-                return CreatedAtAction(nameof(GetAllPosts), new { id = newPost.PostId }, newPost);
+                return NoContent();
             }
             catch (Exception ex)
             {
@@ -72,9 +76,8 @@ namespace NEXT.GEN.Controllers
             }
         }
 
-        // PUT: api/post/{id}
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdatePost(int id, [FromBody] Post updatedPost)
+        [HttpPut("update-post/{id}")]
+        public async Task<IActionResult> UpdatePost(int id, [FromBody] CreatePost updatedPost)
         {
             try
             {
@@ -93,8 +96,7 @@ namespace NEXT.GEN.Controllers
             }
         }
 
-        // DELETE: api/post/{id}
-        [HttpDelete("{id}")]
+        [HttpDelete("delete-post/{id}")]
         public async Task<IActionResult> DeletePost(int id)
         {
             try

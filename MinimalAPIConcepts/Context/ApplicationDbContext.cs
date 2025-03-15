@@ -16,7 +16,7 @@ namespace MinimalAPIConcepts.Context
         public DbSet<Friendships> Friends { get; set; }
         public DbSet<Group> Groups { get; set; }
         public DbSet<GroupMembers> GroupMembers { get; set; }
-        public DbSet<Post> Posts { get; set; }
+        public DbSet<CreatePost> Posts { get; set; }
         public DbSet<Likes> Likes { get; set; } 
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Dislike> Dislikes { get; set; }
@@ -106,8 +106,8 @@ namespace MinimalAPIConcepts.Context
                 .HasForeignKey(c => c.PostId)
                 .OnDelete(DeleteBehavior.NoAction);
 
-            modelBuilder.Entity<Post>().HasKey(p => p.PostId);
-            modelBuilder.Entity<Post>()
+            modelBuilder.Entity<CreatePost>().HasKey(p => p.PostId);
+            modelBuilder.Entity<CreatePost>()
                .HasOne(p => p.User)
                .WithMany(u => u.Posts)
                .HasForeignKey(p => p.UserId)

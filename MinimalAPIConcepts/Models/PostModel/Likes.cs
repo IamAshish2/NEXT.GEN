@@ -11,7 +11,7 @@ namespace NEXT.GEN.Models.PostModel
 
         public int PostId { get; set; }
         [ForeignKey("PostId")]
-        public Post Post { get; set; }
+        public CreatePost Post { get; set; }
 
         public int UserId { get; set; }
         [ForeignKey("UserId")]

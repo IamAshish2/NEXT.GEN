@@ -29,8 +29,8 @@ namespace MinimalAPIConcepts.Helper
             CreateMap<CreateFriendshipDto,Friendships>();
 
             // Post mapper
-            CreateMap<Post,CreatePostDto>();
-            CreateMap<CreatePostDto,Post>();
+            CreateMap<CreatePost,CreatePostDto>();
+            CreateMap<CreatePostDto,CreatePost>();
 
             // add group mappers
             CreateMap<GetGroupMembersDTO,GroupMembers>();

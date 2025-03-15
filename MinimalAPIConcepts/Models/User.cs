@@ -20,7 +20,7 @@ namespace MinimalAPIConcepts.Models
         public string Password { get; set; } = string.Empty!;
 
         // relationships
-        public ICollection<Post> Posts { get; set; } = new List<Post>();
+        public ICollection<CreatePost> Posts { get; set; } = new List<CreatePost>();
         public ICollection<Likes> Likes { get; set; } = new List<Likes>();
         public ICollection<Dislike> Dislikes { get; set; } = new List<Dislike>();
         public ICollection<Comment> Comments { get; set; } = new List<Comment>();
