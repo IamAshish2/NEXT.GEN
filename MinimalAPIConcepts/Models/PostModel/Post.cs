@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NEXT.GEN.Models.PostModel
 {
-    public class Post
+    public class CreatePost
     {
         [Key]
         public int PostId { get; set; }

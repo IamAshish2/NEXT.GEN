@@ -66,7 +66,8 @@ namespace MinimalAPIConcepts.Controllers
 
                 var response = new LoginResponseDto
                 {
-                    Token = token
+                    Token = token,
+                    UserId = user.Id
                 };
 
                 return Ok(response);

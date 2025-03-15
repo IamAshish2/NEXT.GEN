@@ -93,7 +93,7 @@ namespace NEXT.GEN.Controllers
                     GroupName = createGroupDto.GroupName,
                     Description = createGroupDto.Description,
                     CreatorId = createGroupDto.CreatorId,
-                    Members = new List<GroupMembers> { new GroupMembers { UserId = createGroupDto.CreatorId} }
+                    //Members = new List<GroupMembers> { new GroupMembers { UserId = createGroupDto.CreatorId} }
                 };
 
                 group.MemberCount++;
@@ -101,6 +101,10 @@ namespace NEXT.GEN.Controllers
                 var created = await _groupRepository.CreateGroup(group);
                 if (!created)
                     return StatusCode(500, "Something went wrong while creating the group.");
+
+                group.Members = new List<GroupMembers> { new GroupMembers { UserId = createGroupDto.CreatorId } };
+
+                await _groupRepository.Save();
 
                 return CreatedAtAction(nameof(GetGroupByName), new { GroupName = group.GroupName }, group);
             }

@@ -13,25 +13,25 @@ namespace NEXT.GEN.Services.Repository
         {
             _context = context;
         }
-        public async Task<bool> CreatePost(Post newPost)
+        public async Task<bool> CreatePost(CreatePost newPost)
         {
-            var post = await _context.Posts.AddAsync(newPost);
+            await _context.Posts.AddAsync(newPost);
             return await SaveChanges();
 
         }
 
-        public async Task<bool> DeletePost(Post post)
+        public async Task<bool> DeletePost(CreatePost post)
         {
             _context.Posts.Remove(post);
             return await SaveChanges();
         }
 
-        public async Task<ICollection<Post>> GetAllPosts()
+        public async Task<ICollection<CreatePost>> GetAllPosts()
         {
             return await _context.Posts.OrderBy(p => p.PostId).ToListAsync();
         }
 
-        public async Task<ICollection<Post>> GetPostsByUser(int userId)
+        public async Task<ICollection<CreatePost>> GetPostsByUser(int userId)
         {
             return await _context.Posts.OrderBy(p => p.PostId).Where(p => p.UserId == userId).ToListAsync();
         }
@@ -41,7 +41,7 @@ namespace NEXT.GEN.Services.Repository
             return await _context.SaveChangesAsync() > 0;
         }
 
-        public async Task<bool> UpdatePost(Post post)
+        public async Task<bool> UpdatePost(CreatePost post)
         {
             _context.Posts.Update(post);
             return await SaveChanges();
