@@ -92,7 +92,7 @@ namespace NEXT.GEN.Controllers
                 {
                     GroupName = createGroupDto.GroupName,
                     Description = createGroupDto.Description,
-                    CreatorId = createGroupDto.CreatorId,
+                    CreatorName = createGroupDto.CreatorName,
                     //Members = new List<GroupMembers> { new GroupMembers { UserId = createGroupDto.CreatorId} }
                 };
 
@@ -102,7 +102,7 @@ namespace NEXT.GEN.Controllers
                 if (!created)
                     return StatusCode(500, "Something went wrong while creating the group.");
 
-                group.Members = new List<GroupMembers> { new GroupMembers { UserId = createGroupDto.CreatorId } };
+                group.Members = new List<GroupMembers> { new GroupMembers { UserName = createGroupDto.CreatorName } };
 
                 await _groupRepository.Save();
 

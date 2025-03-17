@@ -12,8 +12,8 @@ using MinimalAPIConcepts.Context;
 namespace NEXT.GEN.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250311163638_newdatabasecreation")]
-    partial class newdatabasecreation
+    [Migration("20250317133025_database_remodeled1")]
+    partial class database_remodeled1
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -27,13 +27,26 @@ namespace NEXT.GEN.Migrations
 
             modelBuilder.Entity("MinimalAPIConcepts.Models.User", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                    b.Property<string>("UserName")
+                        .HasColumnType("nvarchar(450)");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    b.Property<string>("Address")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.PrimitiveCollection<string>("Addresses")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Bio")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Course")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FullName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -41,11 +54,10 @@ namespace NEXT.GEN.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("UserName")
-                        .IsRequired()
+                    b.PrimitiveCollection<string>("Socials")
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
+                    b.HasKey("UserName");
 
                     b.ToTable("Users");
                 });
@@ -58,21 +70,26 @@ namespace NEXT.GEN.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FriendshipId"));
 
-                    b.Property<int>("FriendId")
-                        .HasColumnType("int");
+                    b.Property<string>("AnotherUserName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("FriendshipDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UserName1")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("FriendshipId");
 
-                    b.HasIndex("FriendId");
+                    b.HasIndex("UserName");
 
-                    b.HasIndex("UserId", "FriendId")
-                        .IsUnique();
+                    b.HasIndex("UserName1");
 
                     b.ToTable("Friends");
                 });
@@ -82,8 +99,9 @@ namespace NEXT.GEN.Migrations
                     b.Property<string>("GroupName")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("CreatorId")
-                        .HasColumnType("int");
+                    b.Property<string>("CreatorName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -94,7 +112,7 @@ namespace NEXT.GEN.Migrations
 
                     b.HasKey("GroupName");
 
-                    b.HasIndex("CreatorId");
+                    b.HasIndex("CreatorName");
 
                     b.ToTable("Groups");
                 });
@@ -114,14 +132,15 @@ namespace NEXT.GEN.Migrations
                     b.Property<DateTime>("JoinDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("GroupMemberId");
 
                     b.HasIndex("GroupName");
 
-                    b.HasIndex("UserId", "GroupName")
+                    b.HasIndex("UserName", "GroupName")
                         .IsUnique();
 
                     b.ToTable("GroupMembers");
@@ -145,71 +164,20 @@ namespace NEXT.GEN.Migrations
                     b.Property<int>("PostId")
                         .HasColumnType("int");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("CommentId");
 
                     b.HasIndex("PostId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserName");
 
-                    b.ToTable("Comment");
+                    b.ToTable("Comments");
                 });
 
-            modelBuilder.Entity("NEXT.GEN.Models.PostModel.Dislike", b =>
-                {
-                    b.Property<int>("DislikeId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DislikeId"));
-
-                    b.Property<DateTime>("DislikeDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("PostId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("DislikeId");
-
-                    b.HasIndex("PostId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Dislike");
-                });
-
-            modelBuilder.Entity("NEXT.GEN.Models.PostModel.Likes", b =>
-                {
-                    b.Property<int>("LikeId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LikeId"));
-
-                    b.Property<DateTime>("LikedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("PostId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("LikeId");
-
-                    b.HasIndex("PostId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Likes");
-                });
-
-            modelBuilder.Entity("NEXT.GEN.Models.PostModel.Post", b =>
+            modelBuilder.Entity("NEXT.GEN.Models.PostModel.CreatePost", b =>
                 {
                     b.Property<int>("PostId")
                         .ValueGeneratedOnAdd()
@@ -232,28 +200,83 @@ namespace NEXT.GEN.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("PostId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserName");
 
                     b.ToTable("Posts");
+                });
+
+            modelBuilder.Entity("NEXT.GEN.Models.PostModel.Dislike", b =>
+                {
+                    b.Property<int>("DislikeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DislikeId"));
+
+                    b.Property<DateTime>("DislikeDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("PostId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("DislikeId");
+
+                    b.HasIndex("PostId");
+
+                    b.HasIndex("UserName");
+
+                    b.ToTable("Dislikes");
+                });
+
+            modelBuilder.Entity("NEXT.GEN.Models.PostModel.Likes", b =>
+                {
+                    b.Property<int>("LikeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LikeId"));
+
+                    b.Property<DateTime>("LikedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("PostId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("LikeId");
+
+                    b.HasIndex("PostId");
+
+                    b.HasIndex("UserName");
+
+                    b.ToTable("Likes");
                 });
 
             modelBuilder.Entity("NEXT.GEN.Models.Friendships", b =>
                 {
                     b.HasOne("MinimalAPIConcepts.Models.User", "Friend")
                         .WithMany("FriendsFriendships")
-                        .HasForeignKey("FriendId")
+                        .HasForeignKey("UserName")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("MinimalAPIConcepts.Models.User", "User")
                         .WithMany("UserFriendships")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasForeignKey("UserName1")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Friend");
@@ -265,7 +288,7 @@ namespace NEXT.GEN.Migrations
                 {
                     b.HasOne("MinimalAPIConcepts.Models.User", "User")
                         .WithMany("CreatedGroups")
-                        .HasForeignKey("CreatorId")
+                        .HasForeignKey("CreatorName")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -282,7 +305,7 @@ namespace NEXT.GEN.Migrations
 
                     b.HasOne("MinimalAPIConcepts.Models.User", "User")
                         .WithMany("GroupMember")
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("UserName")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
@@ -293,7 +316,7 @@ namespace NEXT.GEN.Migrations
 
             modelBuilder.Entity("NEXT.GEN.Models.PostModel.Comment", b =>
                 {
-                    b.HasOne("NEXT.GEN.Models.PostModel.Post", "Post")
+                    b.HasOne("NEXT.GEN.Models.PostModel.CreatePost", "Post")
                         .WithMany("Comment")
                         .HasForeignKey("PostId")
                         .OnDelete(DeleteBehavior.NoAction)
@@ -301,7 +324,7 @@ namespace NEXT.GEN.Migrations
 
                     b.HasOne("MinimalAPIConcepts.Models.User", "User")
                         .WithMany("Comments")
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("UserName")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
@@ -310,9 +333,20 @@ namespace NEXT.GEN.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("NEXT.GEN.Models.PostModel.CreatePost", b =>
+                {
+                    b.HasOne("MinimalAPIConcepts.Models.User", "User")
+                        .WithMany("Posts")
+                        .HasForeignKey("UserName")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("NEXT.GEN.Models.PostModel.Dislike", b =>
                 {
-                    b.HasOne("NEXT.GEN.Models.PostModel.Post", "Post")
+                    b.HasOne("NEXT.GEN.Models.PostModel.CreatePost", "Post")
                         .WithMany("Dislikes")
                         .HasForeignKey("PostId")
                         .OnDelete(DeleteBehavior.NoAction)
@@ -320,7 +354,7 @@ namespace NEXT.GEN.Migrations
 
                     b.HasOne("MinimalAPIConcepts.Models.User", "User")
                         .WithMany("Dislikes")
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("UserName")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
@@ -331,7 +365,7 @@ namespace NEXT.GEN.Migrations
 
             modelBuilder.Entity("NEXT.GEN.Models.PostModel.Likes", b =>
                 {
-                    b.HasOne("NEXT.GEN.Models.PostModel.Post", "Post")
+                    b.HasOne("NEXT.GEN.Models.PostModel.CreatePost", "Post")
                         .WithMany("Likes")
                         .HasForeignKey("PostId")
                         .OnDelete(DeleteBehavior.NoAction)
@@ -339,22 +373,11 @@ namespace NEXT.GEN.Migrations
 
                     b.HasOne("MinimalAPIConcepts.Models.User", "User")
                         .WithMany("Likes")
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("UserName")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Post");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("NEXT.GEN.Models.PostModel.Post", b =>
-                {
-                    b.HasOne("MinimalAPIConcepts.Models.User", "User")
-                        .WithMany("Posts")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
 
                     b.Navigation("User");
                 });
@@ -383,7 +406,7 @@ namespace NEXT.GEN.Migrations
                     b.Navigation("Members");
                 });
 
-            modelBuilder.Entity("NEXT.GEN.Models.PostModel.Post", b =>
+            modelBuilder.Entity("NEXT.GEN.Models.PostModel.CreatePost", b =>
                 {
                     b.Navigation("Comment");
 

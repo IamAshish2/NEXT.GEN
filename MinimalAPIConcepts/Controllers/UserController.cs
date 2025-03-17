@@ -45,15 +45,15 @@ namespace MinimalAPIConcepts.Controllers
             }
         }
 
-        [HttpGet("get-user-by-id/{userId}")]
+        [HttpGet("get-user-by-name/{userName}")]
         [ProducesResponseType(200, Type = typeof(GetUserDto))] 
         [ProducesResponseType(404)]
         [ProducesResponseType(500, Type = typeof(ErrorResponse))] 
-        public async Task<ActionResult<GetUserDto>> GetUserById(int userId)
+        public async Task<ActionResult<GetUserDto>> GetUserById(string userName)
         {
             try
             {
-                var user = await _userRepository.GetUserByIdAsync(userId);
+                var user = await _userRepository.GetUserByNameAsync(userName);
 
                 if (user == null)
                 {
@@ -67,7 +67,7 @@ namespace MinimalAPIConcepts.Controllers
             }
             catch (Exception ex) 
             {
-                _logger.LogError(ex, "Error retrieving user: {userId}", userId); 
+                _logger.LogError(ex, "Error retrieving user: {userId}", userName); 
                 return StatusCode(500, new ErrorResponse { ErrorCode = "INTERNAL_SERVER_ERROR", Message = "An unexpected error occurred." });
             }
         }
@@ -116,23 +116,24 @@ namespace MinimalAPIConcepts.Controllers
             }
         }
 
-        [HttpPut("update-user/{Id}")]
+        [HttpPut("update-user/{userName}")]
         [ProducesResponseType(201)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
-        public async Task<IActionResult> UpdateUser(int Id, [FromBody] UpdateUserDto updatedUser)
+        public async Task<IActionResult> UpdateUser(string userName, [FromBody] UpdateUserDto updatedUser)
         {
             if(!ModelState.IsValid)  return BadRequest(ModelState);
 
-            if (Id != updatedUser.Id) return BadRequest();
+            if (userName.Trim() != updatedUser.UserName.Trim()) return BadRequest();
 
-            var userExists = await _userRepository.checkIfUserExists(Id);
+            //var userExists = await _userRepository.checkIfUserExists(Id);
+            var userExists = await _userRepository.checkIfUserExists(userName);
             if (!userExists)
             {
                 return NotFound();
             }
 
-            var existingUser = await _userRepository.GetUserByIdAsync(Id);
+            var existingUser = await _userRepository.GetUserByNameAsync(userName);
             existingUser.UserName = updatedUser.UserName;
             existingUser.Email = updatedUser.Email;
 
@@ -147,19 +148,19 @@ namespace MinimalAPIConcepts.Controllers
             return NoContent();
         }
 
-        [HttpDelete("deleteUser/{userIdDelete}")]
+        [HttpDelete("deleteUser/{userName}")]
         [ProducesResponseType(200)]
         [ProducesResponseType(500)]
         
-        public async Task<IActionResult> DeleteUser(int userIdDelete)
+        public async Task<IActionResult> DeleteUser(string userName)
         {
-            var findUser = await _userRepository.GetUserByIdAsync(userIdDelete);
+            var findUser = await _userRepository.GetUserByNameAsync(userName);
             if (findUser == null)
             {
                 return NotFound();
             }
 
-            bool success = await _userRepository.DeleteUserAsync(userIdDelete);
+            bool success = await _userRepository.DeleteUserAsync(userName);
             if (!success)
             {
                 ModelState.AddModelError("","An error occured while deleting the user");

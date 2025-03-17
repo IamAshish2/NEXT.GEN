@@ -20,9 +20,9 @@ namespace MinimalAPIConcepts.Services.Repository
             return await SaveAsync();
         }
 
-        public async Task<bool> DeleteUserAsync(int userId)
+        public async Task<bool> DeleteUserAsync(string UserName)
         {
-            User user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            User user = await _context.Users.FirstOrDefaultAsync(u => u.UserName == UserName);
             if (user != null)
             {
 
@@ -31,14 +31,14 @@ namespace MinimalAPIConcepts.Services.Repository
             return await SaveAsync();
         }
 
-        public async Task<User> GetUserByIdAsync(int userId)
+        public async Task<User> GetUserByNameAsync(string UserName)
         {
-            return await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            return await _context.Users.FirstOrDefaultAsync(u => u.UserName == UserName);
         }
 
         public async Task<ICollection<User>> GetUsersAsync()
         {
-            return await _context.Users.OrderBy(u => u.Id).ToListAsync();
+            return await _context.Users.OrderBy(u => u.UserName).ToListAsync();
         }
 
         public async Task<bool> SaveAsync()
@@ -63,9 +63,9 @@ namespace MinimalAPIConcepts.Services.Repository
             var user = await _context.Users.FirstOrDefaultAsync(u => u.UserName == userName);
             return user == null ? false : true;
         }
-        public async Task<bool> checkIfUserExists(int userId)
+        public async Task<bool> checkIfUserExists(string UserName)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.UserName == UserName);
             return user == null ? false : true;
         }
     }

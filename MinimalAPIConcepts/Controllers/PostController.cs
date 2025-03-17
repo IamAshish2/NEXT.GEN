@@ -33,15 +33,15 @@ namespace NEXT.GEN.Controllers
             }
         }
 
-        [HttpGet("get-user/{userId}")]
-        public async Task<IActionResult> GetPostsByUser(int userId)
+        [HttpGet("get-user/{userName}")]
+        public async Task<IActionResult> GetPostsByUser(string userName)
 
         {
             try
             {
-                var posts = await _postRepository.GetPostsByUser(userId);
+                var posts = await _postRepository.GetPostsByUser(userName);
                 if (posts == null || !posts.Any())
-                    return NotFound($"No posts found for user with ID {userId}");
+                    return NotFound($"No posts found for user with ID {userName}");
 
                 return Ok(posts);
             }
@@ -59,7 +59,7 @@ namespace NEXT.GEN.Controllers
                 if (newPost == null)
                     return BadRequest("Post data is required.");
 
-                if (!newPost.UserId.HasValue)
+                if (newPost.userName == null)
                     return BadRequest("The user id was not found.");
 
                 var mappedPost = _mapper.Map<CreatePost>(newPost);

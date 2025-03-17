@@ -8,15 +8,15 @@ namespace NEXT.GEN.Services.Interfaces
     {
         Task<ActionResult<ICollection<Friendships>>> GetAllFriendships();
         // get all friends of the user
-        Task<ActionResult<ICollection<GetUsersFriendshipsDto>>> GetUsersFriends(int userId);
+        Task<ActionResult<ICollection<GetUsersFriendshipsDto>>> GetUsersFriends(string UserName);
         // add friend for a user
 
-        Task<bool> CheckIfFriendshipAlreadyExists(int requestorId, int requestedId);
+        Task<bool> CheckIfFriendshipAlreadyExists(string requestorUserName,string requestedUserName);
         Task<bool> AddFriend(Friendships newFriend);
         // remove an existing friend of a user
         Task<bool> RemoveFriend(Friendships friend);
         // get the whole friendship row from the table.
-        Task<Friendships> GetFriendship(int userId, int anotherUserId);
+        Task<Friendships> GetFriendship(string requestorUserName, string requestedUserName);
         Task<bool> Save();
     }
 }

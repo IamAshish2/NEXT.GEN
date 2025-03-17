@@ -15,6 +15,6 @@ namespace NEXT.GEN.Services.Interfaces
         //Task<bool> GroupExists(int groupId);
         Task<bool> GroupExists(string groupName);
 
-        Task<bool> IsUserAlreadyAMember(int userId,string groupName);
+        Task<bool> IsUserAlreadyAMember(string userName,string groupName);
     }
 }

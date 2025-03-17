@@ -37,11 +37,10 @@ namespace NEXT.GEN.Services.Repository
                 .Select(g => new GetGroupMembersDTO
                 {
                     JoinDate = g.JoinDate,
-                    UserId = g.UserId,
+                    userName = g.UserName,
                     GroupName = g.Group.GroupName,
                     User = new GetUserDto
                     {
-                        Id = g.User.Id,
                         UserName = g.User.UserName,
                         Email = g.User.Email,
                     }
@@ -86,9 +85,9 @@ namespace NEXT.GEN.Services.Repository
             return group != null;
         }
 
-        public async Task<bool> IsUserAlreadyAMember(int userId,string groupName)
+        public async Task<bool> IsUserAlreadyAMember(string userName,string groupName)
         {
-            var userExists = await _context.GroupMembers.FirstOrDefaultAsync(g => g.UserId == userId && g.GroupName == groupName);
+            var userExists = await _context.GroupMembers.FirstOrDefaultAsync(g => g.UserName == userName && g.GroupName == groupName);
             return userExists == null;
         }
     }

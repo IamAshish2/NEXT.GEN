@@ -36,14 +36,14 @@ namespace NEXT.GEN.Controllers
                     return BadRequest(ModelState);
                 }
 
-                var checkFriendshipExists = await _friendshipsRepository.CheckIfFriendshipAlreadyExists(addNewFriend.UserId,addNewFriend.FriendId);
+                var checkFriendshipExists = await _friendshipsRepository.CheckIfFriendshipAlreadyExists(addNewFriend.RequestorUserName,addNewFriend.RequestedUserName);
                 if (checkFriendshipExists)
                 {
                     return BadRequest("The friendship already exists.");
                 }
 
-                var getRequestor = await _userRepository.GetUserByIdAsync(addNewFriend.UserId);
-                var getRequested = await _userRepository.GetUserByIdAsync(addNewFriend.FriendId);
+                var getRequestor = await _userRepository.GetUserByNameAsync(addNewFriend.RequestorUserName);
+                var getRequested = await _userRepository.GetUserByNameAsync(addNewFriend.RequestedUserName);
 
                 if(getRequestor == null || getRequested == null)
                 {
@@ -69,18 +69,18 @@ namespace NEXT.GEN.Controllers
         }
 
 
-        [HttpGet("get-users-friends/{userId}")]
-        public async Task<ActionResult<ICollection<GetUsersFriendshipsDto>>> GetUsersFriends(int userId)
+        [HttpGet("get-users-friends/{userName}")]
+        public async Task<ActionResult<ICollection<GetUsersFriendshipsDto>>> GetUsersFriends(string userName )
         {
             try
             {
-                var userExists = await _userRepository.checkIfUserExists(userId);
+                var userExists = await _userRepository.checkIfUserExists(userName);
                 if (!userExists)
                 {
                     return BadRequest();
                 }
 
-                var friendships = await _friendshipsRepository.GetUsersFriends(userId);
+                var friendships = await _friendshipsRepository.GetUsersFriends(userName);
                 if(friendships == null)
                 {
                     return Ok();
@@ -99,15 +99,15 @@ namespace NEXT.GEN.Controllers
         {
             try
             {
-                var getUser = await _userRepository.GetUserByIdAsync(removeFriend.UserId);
-                var getAnotherUser = await _userRepository.GetUserByIdAsync(removeFriend.FriendId);
+                var getUser = await _userRepository.GetUserByNameAsync(removeFriend.RequestorUserName);
+                var getAnotherUser = await _userRepository.GetUserByNameAsync(removeFriend.RequestedUserName);
 
                 if(getUser == null || getAnotherUser == null)
                 {
                     return BadRequest();
                 }
 
-                var friendship = await _friendshipsRepository.GetFriendship(removeFriend.UserId,removeFriend.FriendId);
+                var friendship = await _friendshipsRepository.GetFriendship(removeFriend.RequestorUserName,removeFriend.RequestedUserName);
 
                 if(! await _friendshipsRepository.RemoveFriend(friendship))
                 {

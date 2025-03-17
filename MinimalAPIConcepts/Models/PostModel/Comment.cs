@@ -9,8 +9,8 @@ namespace NEXT.GEN.Models.PostModel
         [Key]
         public int CommentId { get; set; }
         public string CommentText { get; set; }
-        public int UserId { get; set; }
-        [ForeignKey("UserId")]
+        public string UserName { get; set; }
+        [ForeignKey("UserName")]
         public User User { get; set; }
         public int PostId { get; set; }
         [ForeignKey("PostId")]

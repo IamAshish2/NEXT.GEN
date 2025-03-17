@@ -8,6 +8,7 @@ using MinimalAPIConcepts.Models;
 using MinimalAPIConcepts.Services.Interfaces;
 using MinimalAPIConcepts.Services.Repository;
 using NEXT.GEN.Models.EmailModel;
+using NEXT.GEN.Services.HTTPONLY_MIDDLEWARE;
 using NEXT.GEN.Services.Interfaces;
 using NEXT.GEN.Services.Repository;
 using System.Net;
@@ -104,6 +105,7 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 //app.UseAuthorization();
 
+//app.UseMiddleware<JwtMiddleware>();
 // Map controllers
 app.MapControllers();
 
@@ -116,5 +118,6 @@ if (app.Environment.IsDevelopment())
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "Minimal Api Practice v1");
     });
 }
+
 
 app.Run();

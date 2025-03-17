@@ -8,6 +8,6 @@ namespace NEXT.GEN.Dtos.PostDto
         public string Description { get; set; }
         //public DateTime PostedDate { get; set; }
         public List<string> ImageUrls { get; set; } = new List<string>();
-        public int? UserId { get; set; }
+        public string userName { get; set; }
     }
 }

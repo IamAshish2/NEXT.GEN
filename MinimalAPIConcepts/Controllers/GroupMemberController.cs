@@ -74,7 +74,7 @@ namespace NEXT.GEN.Controllers
                 return BadRequest("The group does not exist.");
 
             // check if the user is already a memeber
-            var isAMember = await _groupMemberRepository.IsUserAlreadyAMember(request.UserId,request.GroupName);
+            var isAMember = await _groupMemberRepository.IsUserAlreadyAMember(request.userName,request.GroupName);
             if (!isAMember)
                 return BadRequest("The user is already a part of the group.");
 

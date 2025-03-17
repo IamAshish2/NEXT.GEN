@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace NEXT.GEN.Migrations
 {
     /// <inheritdoc />
-    public partial class newdatabasecreation : Migration
+    public partial class database_remodeled1 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -15,15 +15,19 @@ namespace NEXT.GEN.Migrations
                 name: "Users",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    UserName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UserName = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    FullName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Password = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Bio = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Course = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Socials = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Addresses = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Users", x => x.Id);
+                    table.PrimaryKey("PK_Users", x => x.UserName);
                 });
 
             migrationBuilder.CreateTable(
@@ -32,25 +36,26 @@ namespace NEXT.GEN.Migrations
                 {
                     FriendshipId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<int>(type: "int", nullable: false),
-                    FriendId = table.Column<int>(type: "int", nullable: false),
+                    UserName = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    UserName1 = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    AnotherUserName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     FriendshipDate = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Friends", x => x.FriendshipId);
                     table.ForeignKey(
-                        name: "FK_Friends_Users_FriendId",
-                        column: x => x.FriendId,
+                        name: "FK_Friends_Users_UserName",
+                        column: x => x.UserName,
                         principalTable: "Users",
-                        principalColumn: "Id",
+                        principalColumn: "UserName",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Friends_Users_UserId",
-                        column: x => x.UserId,
+                        name: "FK_Friends_Users_UserName1",
+                        column: x => x.UserName1,
                         principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        principalColumn: "UserName",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -60,16 +65,16 @@ namespace NEXT.GEN.Migrations
                     GroupName = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     MemberCount = table.Column<int>(type: "int", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreatorId = table.Column<int>(type: "int", nullable: false)
+                    CreatorName = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Groups", x => x.GroupName);
                     table.ForeignKey(
-                        name: "FK_Groups_Users_CreatorId",
-                        column: x => x.CreatorId,
+                        name: "FK_Groups_Users_CreatorName",
+                        column: x => x.CreatorName,
                         principalTable: "Users",
-                        principalColumn: "Id",
+                        principalColumn: "UserName",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -83,16 +88,16 @@ namespace NEXT.GEN.Migrations
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PostedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ImageUrls = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: false)
+                    UserName = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Posts", x => x.PostId);
                     table.ForeignKey(
-                        name: "FK_Posts_Users_UserId",
-                        column: x => x.UserId,
+                        name: "FK_Posts_Users_UserName",
+                        column: x => x.UserName,
                         principalTable: "Users",
-                        principalColumn: "Id",
+                        principalColumn: "UserName",
                         onDelete: ReferentialAction.Restrict);
                 });
 
@@ -103,7 +108,7 @@ namespace NEXT.GEN.Migrations
                     GroupMemberId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     JoinDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: false),
+                    UserName = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     GroupName = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
@@ -116,61 +121,61 @@ namespace NEXT.GEN.Migrations
                         principalColumn: "GroupName",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_GroupMembers_Users_UserId",
-                        column: x => x.UserId,
+                        name: "FK_GroupMembers_Users_UserName",
+                        column: x => x.UserName,
                         principalTable: "Users",
-                        principalColumn: "Id");
+                        principalColumn: "UserName");
                 });
 
             migrationBuilder.CreateTable(
-                name: "Comment",
+                name: "Comments",
                 columns: table => new
                 {
                     CommentId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     CommentText = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: false),
+                    UserName = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     PostId = table.Column<int>(type: "int", nullable: false),
                     CommentDate = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Comment", x => x.CommentId);
+                    table.PrimaryKey("PK_Comments", x => x.CommentId);
                     table.ForeignKey(
-                        name: "FK_Comment_Posts_PostId",
+                        name: "FK_Comments_Posts_PostId",
                         column: x => x.PostId,
                         principalTable: "Posts",
                         principalColumn: "PostId");
                     table.ForeignKey(
-                        name: "FK_Comment_Users_UserId",
-                        column: x => x.UserId,
+                        name: "FK_Comments_Users_UserName",
+                        column: x => x.UserName,
                         principalTable: "Users",
-                        principalColumn: "Id");
+                        principalColumn: "UserName");
                 });
 
             migrationBuilder.CreateTable(
-                name: "Dislike",
+                name: "Dislikes",
                 columns: table => new
                 {
                     DislikeId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<int>(type: "int", nullable: false),
+                    UserName = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     PostId = table.Column<int>(type: "int", nullable: false),
                     DislikeDate = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Dislike", x => x.DislikeId);
+                    table.PrimaryKey("PK_Dislikes", x => x.DislikeId);
                     table.ForeignKey(
-                        name: "FK_Dislike_Posts_PostId",
+                        name: "FK_Dislikes_Posts_PostId",
                         column: x => x.PostId,
                         principalTable: "Posts",
                         principalColumn: "PostId");
                     table.ForeignKey(
-                        name: "FK_Dislike_Users_UserId",
-                        column: x => x.UserId,
+                        name: "FK_Dislikes_Users_UserName",
+                        column: x => x.UserName,
                         principalTable: "Users",
-                        principalColumn: "Id");
+                        principalColumn: "UserName");
                 });
 
             migrationBuilder.CreateTable(
@@ -180,7 +185,7 @@ namespace NEXT.GEN.Migrations
                     LikeId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     PostId = table.Column<int>(type: "int", nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: false),
+                    UserName = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     LikedDate = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
@@ -192,42 +197,41 @@ namespace NEXT.GEN.Migrations
                         principalTable: "Posts",
                         principalColumn: "PostId");
                     table.ForeignKey(
-                        name: "FK_Likes_Users_UserId",
-                        column: x => x.UserId,
+                        name: "FK_Likes_Users_UserName",
+                        column: x => x.UserName,
                         principalTable: "Users",
-                        principalColumn: "Id");
+                        principalColumn: "UserName");
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Comment_PostId",
-                table: "Comment",
+                name: "IX_Comments_PostId",
+                table: "Comments",
                 column: "PostId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Comment_UserId",
-                table: "Comment",
-                column: "UserId");
+                name: "IX_Comments_UserName",
+                table: "Comments",
+                column: "UserName");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Dislike_PostId",
-                table: "Dislike",
+                name: "IX_Dislikes_PostId",
+                table: "Dislikes",
                 column: "PostId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Dislike_UserId",
-                table: "Dislike",
-                column: "UserId");
+                name: "IX_Dislikes_UserName",
+                table: "Dislikes",
+                column: "UserName");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Friends_FriendId",
+                name: "IX_Friends_UserName",
                 table: "Friends",
-                column: "FriendId");
+                column: "UserName");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Friends_UserId_FriendId",
+                name: "IX_Friends_UserName1",
                 table: "Friends",
-                columns: new[] { "UserId", "FriendId" },
-                unique: true);
+                column: "UserName1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_GroupMembers_GroupName",
@@ -235,15 +239,15 @@ namespace NEXT.GEN.Migrations
                 column: "GroupName");
 
             migrationBuilder.CreateIndex(
-                name: "IX_GroupMembers_UserId_GroupName",
+                name: "IX_GroupMembers_UserName_GroupName",
                 table: "GroupMembers",
-                columns: new[] { "UserId", "GroupName" },
+                columns: new[] { "UserName", "GroupName" },
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Groups_CreatorId",
+                name: "IX_Groups_CreatorName",
                 table: "Groups",
-                column: "CreatorId");
+                column: "CreatorName");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Likes_PostId",
@@ -251,24 +255,24 @@ namespace NEXT.GEN.Migrations
                 column: "PostId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Likes_UserId",
+                name: "IX_Likes_UserName",
                 table: "Likes",
-                column: "UserId");
+                column: "UserName");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Posts_UserId",
+                name: "IX_Posts_UserName",
                 table: "Posts",
-                column: "UserId");
+                column: "UserName");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Comment");
+                name: "Comments");
 
             migrationBuilder.DropTable(
-                name: "Dislike");
+                name: "Dislikes");
 
             migrationBuilder.DropTable(
                 name: "Friends");

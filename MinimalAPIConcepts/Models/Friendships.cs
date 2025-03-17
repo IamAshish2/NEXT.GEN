@@ -8,20 +8,20 @@ namespace NEXT.GEN.Models
 {
     // this table represents the friends the user can have
     // the intermediate table between users and users | one user can have many friends who are other users (self refrencing relationship)
-    [Index(nameof(UserId), nameof(FriendId), IsUnique = true)]
+    //[Index(nameof(UserId), nameof(FriendId), IsUnique = true)]
     public class Friendships
     {
         [Key]
         public int FriendshipId { get; set; }
         // the curent user
-        public int UserId { get; set; }
-        [ForeignKey("UserId")]
+        public string UserName { get; set; }
+        [ForeignKey("UserName")]
         // navigation property for the first user
         public User User { get; set; }
 
         // the user the current user is friends with
-        public int FriendId { get; set; }
-        [ForeignKey("FriendId")]
+        public string AnotherUserName { get; set; }
+        [ForeignKey("AnotherUserName")]
         // navigation property for the second user
         public User Friend { get; set; }    
         public DateTime FriendshipDate { get; set; }

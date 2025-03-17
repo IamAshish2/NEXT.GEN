@@ -36,13 +36,13 @@ namespace MinimalAPIConcepts.Context
             modelBuilder.Entity<Friendships>()
                 .HasOne(f => f.User)
                 .WithMany(f => f.UserFriendships)
-                .HasForeignKey(f => f.UserId)
+                .HasForeignKey(f => f.UserName)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Friendships>()
                 .HasOne(f => f.Friend)
                 .WithMany(f => f.FriendsFriendships)
-                .HasForeignKey(f => f.FriendId)
+                .HasForeignKey(f => f.UserName)
                 .OnDelete(DeleteBehavior.Restrict);
 
             // the unique key for the groupMembers table
@@ -59,11 +59,11 @@ namespace MinimalAPIConcepts.Context
             modelBuilder.Entity<GroupMembers>()
                 .HasOne(g => g.User)
                 .WithMany(g => g.GroupMember)
-                .HasForeignKey(g => g.UserId)
+                .HasForeignKey(g => g.UserName)
                 .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<GroupMembers>()
-              .HasIndex(u => new { u.UserId, u.GroupName }).IsUnique();
+              .HasIndex(u => new { u.UserName, u.GroupName }).IsUnique();
 
             // 
             modelBuilder.Entity<Comment>().HasKey(c => c.CommentId);
@@ -71,7 +71,7 @@ namespace MinimalAPIConcepts.Context
             modelBuilder.Entity<Comment>()
                 .HasOne(c => c.User)
                 .WithMany(c => c.Comments)
-                .HasForeignKey(c => c.UserId)
+                .HasForeignKey(c => c.UserName)
                 .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<Comment>()
@@ -84,7 +84,7 @@ namespace MinimalAPIConcepts.Context
             modelBuilder.Entity<Likes>()
                .HasOne(c => c.User)
                .WithMany(c => c.Likes)
-               .HasForeignKey(c => c.UserId)
+               .HasForeignKey(c => c.UserName)
                .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<Likes>()
@@ -97,7 +97,7 @@ namespace MinimalAPIConcepts.Context
             modelBuilder.Entity<Dislike>()
                .HasOne(c => c.User)
                .WithMany(c => c.Dislikes)
-               .HasForeignKey(c => c.UserId)
+               .HasForeignKey(c => c.UserName)
                .OnDelete(DeleteBehavior.NoAction);
 
            modelBuilder.Entity<Dislike>()
@@ -110,7 +110,7 @@ namespace MinimalAPIConcepts.Context
             modelBuilder.Entity<CreatePost>()
                .HasOne(p => p.User)
                .WithMany(u => u.Posts)
-               .HasForeignKey(p => p.UserId)
+               .HasForeignKey(p => p.UserName)
                .OnDelete(DeleteBehavior.Restrict);
         }
     }
