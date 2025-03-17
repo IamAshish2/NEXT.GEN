@@ -7,7 +7,7 @@ namespace NEXT.GEN.Services.Interfaces
         // get all posts by all users
         Task<ICollection<CreatePost>> GetAllPosts();
         // get all post by a certain user
-        Task<ICollection<CreatePost>> GetPostsByUser(int userId);
+        Task<ICollection<CreatePost>> GetPostsByUser(string userName);
         Task<bool> CreatePost(CreatePost newPost);
         Task<bool> DeletePost(CreatePost post);
         Task<bool> UpdatePost(CreatePost post);

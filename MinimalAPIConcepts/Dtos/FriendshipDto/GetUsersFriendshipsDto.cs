@@ -7,7 +7,7 @@ namespace NEXT.GEN.Dtos.FriendshipDto
     public class GetUsersFriendshipsDto
     {
         public int FriendshipId { get; set; }
-        public int FriendId { get; set; }
+        //public string userName { get; set; }
         public GetUserDto Friend { get; set; }
     }
 }

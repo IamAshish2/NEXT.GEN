@@ -10,8 +10,8 @@ namespace NEXT.GEN.Models
         [Key]
         public int GroupMemberId { get; set; }
         public DateTime JoinDate { get; set; }
-        public int UserId { get; set; }
-        [ForeignKey("UserId")]
+        public string UserName { get; set; }
+        [ForeignKey("UserName")]
         public User User { get; set; }
         //public int GroupId {  get; set; }
         // make groupName the foreign key 

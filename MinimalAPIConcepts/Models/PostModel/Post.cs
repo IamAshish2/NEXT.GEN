@@ -17,8 +17,8 @@ namespace NEXT.GEN.Models.PostModel
         public List<string> ImageUrls { get; set; } = new List<string>();
 
         // one user can make many posts.
-        public int UserId { get; set; }
-        [ForeignKey("UserId")]
+        public string UserName { get; set; }
+        [ForeignKey("UserName")]
         public User User { get; set; }
 
         // one post can have many likes, dislikes and comments.

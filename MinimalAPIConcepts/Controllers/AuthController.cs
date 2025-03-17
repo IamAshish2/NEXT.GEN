@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using MinimalAPIConcepts.Context;
 using MinimalAPIConcepts.Dtos.UserDto;
+using MinimalAPIConcepts.Models;
 using MinimalAPIConcepts.Services.Interfaces;
 using NEXT.GEN.Dtos.UserDto;
 using NEXT.GEN.Models;
@@ -16,11 +18,13 @@ namespace MinimalAPIConcepts.Controllers
         
         private readonly ApplicationDbContext _context;
         private readonly ITokenGenerator _tokenGenerator;
+        private readonly JwtSettings _jwtSettings;
 
-        public AuthController(ApplicationDbContext context,ITokenGenerator tokenGenerator)
+        public AuthController(ApplicationDbContext context,ITokenGenerator tokenGenerator, IOptions<JwtSettings> jwtSettings)
         {
             _context = context;
             _tokenGenerator = tokenGenerator;
+            _jwtSettings = jwtSettings.Value;
         }
 
         [HttpGet]
@@ -64,10 +68,20 @@ namespace MinimalAPIConcepts.Controllers
 
                 var token = _tokenGenerator.GenerateToken(loginUser.UserName, loginUser.Email);
 
+                // Set the token in an HTTP-only cookie
+                //var cookieOptions = new CookieOptions
+                //{
+                //    HttpOnly = true,
+                //    Secure = true,
+                //    SameSite = SameSiteMode.Strict,
+                //    Expires = DateTime.UtcNow.AddMinutes(Convert.ToInt32(_jwtSettings.ExpireMinutes))
+                //};
+                //Response.Cookies.Append("auth_token", token, cookieOptions);
+
                 var response = new LoginResponseDto
                 {
                     Token = token,
-                    UserId = user.Id
+                    UserName = user.UserName
                 };
 
                 return Ok(response);

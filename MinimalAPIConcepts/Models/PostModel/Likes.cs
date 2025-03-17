@@ -13,8 +13,8 @@ namespace NEXT.GEN.Models.PostModel
         [ForeignKey("PostId")]
         public CreatePost Post { get; set; }
 
-        public int UserId { get; set; }
-        [ForeignKey("UserId")]
+        public string UserName { get; set; }
+        [ForeignKey("UserName")]
         public User User { get; set; }
 
         public DateTime LikedDate { get; set; } 

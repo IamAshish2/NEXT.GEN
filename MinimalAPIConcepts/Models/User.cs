@@ -8,16 +8,23 @@ namespace MinimalAPIConcepts.Models
     public class User
     {
         [Key]
-        public int Id { get; set; }
-
-        [Required]
         public string? UserName { get; set; }
+        [Required]
+        public string FullName { get; set; }
 
         [Required, EmailAddress]
         public string? Email { get; set; }
 
         [Required]
         public string Password { get; set; } = string.Empty!;
+
+        // some user details
+        public string? Bio {  get; set; }
+// the course the student is studying
+        public string? Course { get; set; }
+        public string? Address {  get; set; }
+        public ICollection<string>? Socials { get; set; } = new List<string>();
+        public ICollection<string>? Addresses { get; set; } = new List<string>();
 
         // relationships
         public ICollection<CreatePost> Posts { get; set; } = new List<CreatePost>();

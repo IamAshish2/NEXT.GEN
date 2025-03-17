@@ -31,9 +31,9 @@ namespace NEXT.GEN.Services.Repository
             return await _context.Posts.OrderBy(p => p.PostId).ToListAsync();
         }
 
-        public async Task<ICollection<CreatePost>> GetPostsByUser(int userId)
+        public async Task<ICollection<CreatePost>> GetPostsByUser(string userName)
         {
-            return await _context.Posts.OrderBy(p => p.PostId).Where(p => p.UserId == userId).ToListAsync();
+            return await _context.Posts.OrderBy(p => p.PostId).Where(p => p.UserName == userName).ToListAsync();
         }
 
         public async Task<bool> SaveChanges()
