@@ -123,8 +123,9 @@ namespace MinimalAPIConcepts.Controllers
         public async Task<IActionResult> UpdateUser(string userName, [FromBody] UpdateUserDto updatedUser)
         {
             if(!ModelState.IsValid)  return BadRequest(ModelState);
+            if (userName == null) return BadRequest();
 
-            if (userName.Trim() != updatedUser.UserName.Trim()) return BadRequest();
+            //if (userName.Trim() != updatedUser.UserName.Trim()) return BadRequest();
 
             //var userExists = await _userRepository.checkIfUserExists(Id);
             var userExists = await _userRepository.checkIfUserExists(userName);
@@ -134,12 +135,17 @@ namespace MinimalAPIConcepts.Controllers
             }
 
             var existingUser = await _userRepository.GetUserByNameAsync(userName);
-            existingUser.UserName = updatedUser.UserName;
-            existingUser.Email = updatedUser.Email;
 
-            //var mappedUser = _mapper.Map<User>(updatedUser);
+            //existingUser.UserName = updatedUser.UserName;
+            //existingUser.Email = updatedUser.Email;
 
-            bool success = await _userRepository.UpdateUserAsync(existingUser);
+            // Map only non-null properties from updatedUser to existingUser
+            _mapper.Map(updatedUser, existingUser);
+
+
+            var mappedUser = _mapper.Map<User>(existingUser);
+
+            bool success = await _userRepository.UpdateUserAsync(mappedUser);
             if (!success)
             {
                 ModelState.AddModelError("", "Unsuccessful operation. Try again!");

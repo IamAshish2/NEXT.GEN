@@ -12,8 +12,8 @@ using MinimalAPIConcepts.Context;
 namespace NEXT.GEN.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250317133025_database_remodeled1")]
-    partial class database_remodeled1
+    [Migration("20250318150244_update")]
+    partial class update
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -33,9 +33,6 @@ namespace NEXT.GEN.Migrations
                     b.Property<string>("Address")
                         .HasColumnType("nvarchar(max)");
 
-                    b.PrimitiveCollection<string>("Addresses")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Bio")
                         .HasColumnType("nvarchar(max)");
 
@@ -47,11 +44,13 @@ namespace NEXT.GEN.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FullName")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Password")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.PrimitiveCollection<string>("Skills")
                         .HasColumnType("nvarchar(max)");
 
                     b.PrimitiveCollection<string>("Socials")
