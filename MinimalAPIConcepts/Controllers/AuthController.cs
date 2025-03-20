@@ -8,6 +8,7 @@ using MinimalAPIConcepts.Models;
 using MinimalAPIConcepts.Services.Interfaces;
 using NEXT.GEN.Dtos.UserDto;
 using NEXT.GEN.Models;
+using System.Security.Claims;
 
 namespace MinimalAPIConcepts.Controllers
 {
@@ -28,7 +29,7 @@ namespace MinimalAPIConcepts.Controllers
         }
 
         [HttpGet]
-        //[Authorize]
+        [Authorize]
         // This endpoint can only be hit by the authorized user i.e. admin in this case. 
         // so, if the endpoint returns 200 ok , the user is authorized
         // else the user is not authorized.
@@ -91,6 +92,32 @@ namespace MinimalAPIConcepts.Controllers
 
                 return BadRequest(Error.Message);
             }
+        }
+
+
+        [HttpGet("getUserByToken/{token}")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400, Type = typeof(ErrorResponse))]
+        [ProducesResponseType(401, Type = typeof(ErrorResponse))]
+        public  IActionResult getUserNameFromToken(string token)
+        {
+            if (token == null) return BadRequest();
+
+            var validToken =  _tokenGenerator.ValidateToken(token);
+
+            if(validToken == null)
+            {
+                return BadRequest("The token is not valid");
+            }
+
+            var userName = validToken.Claims.FirstOrDefault(t => t.Type == ClaimTypes.Name);
+
+            if(userName == null)
+            {
+                return BadRequest("The user name is null");
+            }
+
+            return Ok(new { userName});
         }
     }
 }
