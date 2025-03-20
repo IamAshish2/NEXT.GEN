@@ -70,9 +70,36 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
-{
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Minimal Api Practice", Description = "Say hello minimal api", Version = "v1" });
-});
+    {
+        c.SwaggerDoc("v1", new OpenApiInfo { Title = "Minimal Api Practice", Description = "Say hello minimal api", Version = "v1" });
+
+        //  define the security defination of the added security scheme
+        c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+        {
+            In = ParameterLocation.Header,
+            Name = "Bearer",
+            Type = SecuritySchemeType.Http,
+            Description = "Please enter the jwt token here for authorization",
+            Scheme = "bearer",
+            BearerFormat = "JWT"
+        });
+
+        c.AddSecurityRequirement(new OpenApiSecurityRequirement
+        {
+             {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type=ReferenceType.SecurityScheme,
+                    Id="Bearer"
+                }
+            },
+            new string[]{}
+        }
+        });
+    }
+);
 
 // Register controllers
 builder.Services.AddControllers();
@@ -103,7 +130,7 @@ var app = builder.Build();
 app.UseCors("AllowAllOrigins");
 app.UseHttpsRedirection();
 app.UseAuthentication();
-//app.UseAuthorization();
+app.UseAuthorization();
 
 //app.UseMiddleware<JwtMiddleware>();
 // Map controllers

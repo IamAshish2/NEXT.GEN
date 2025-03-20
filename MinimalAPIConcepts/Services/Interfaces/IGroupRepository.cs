@@ -1,10 +1,11 @@
-﻿using NEXT.GEN.Models;
+﻿using NEXT.GEN.Dtos.GroupDto;
+using NEXT.GEN.Models;
 
 namespace NEXT.GEN.Services.Interfaces
 {
     public interface IGroupRepository
     {
-        Task<ICollection<Group>> GetAllGroups();
+        Task<ICollection<GetGroupDetailsDto>> GetAllGroups();
         //Task<Group> GetGroupById(int groupId);
         Task<Group> GetGroupByName(string groupName);
         Task<bool> DoesGroupExist(string groupName);

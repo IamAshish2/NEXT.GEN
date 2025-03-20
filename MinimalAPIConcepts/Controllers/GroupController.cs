@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using NEXT.GEN.Dtos.GroupDto;
 using NEXT.GEN.Models;
 using NEXT.GEN.Services.Interfaces;
@@ -14,45 +15,35 @@ namespace NEXT.GEN.Controllers
     public class GroupsController : ControllerBase
     {
         private readonly IGroupRepository _groupRepository;
+        private readonly IMapper _mapper;
 
-        public GroupsController(IGroupRepository groupRepository)
+        public GroupsController(IGroupRepository groupRepository,IMapper mapper)
         {
             _groupRepository = groupRepository;
+            _mapper = mapper;
         }
 
         // GET: api/groups
         [HttpGet("get-all-groups")]
-        public async Task<ActionResult<ICollection<Group>>> GetAllGroups()
+        public async Task<ActionResult<ICollection<GetGroupDetailsDto>>> GetAllGroups()
         {
             try
             {
                 var groups = await _groupRepository.GetAllGroups();
+                
+                if(groups == null)
+                {
+                    return NotFound();
+                }
+
                 return Ok(groups);
+
             }
             catch (Exception ex)
             {
                 return StatusCode(500, $"An error occurred: {ex.Message}");
             }
         }
-
-        // GET: api/groups/{id}
-        //[HttpGet("get-by-id/{id}")]
-        //public async Task<ActionResult<Group>> GetGroupById(int id)
-        //{
-        //    try
-        //    {
-        //        var group = await _groupRepository.GetGroupById(id);
-
-        //        if (group == null)
-        //            return NotFound("Group not found.");
-
-        //        return Ok(group);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return StatusCode(500, $"An error occurred: {ex.Message}");
-        //    }
-        //}
 
         [HttpGet("get-by-groupName/{groupName}")]
         public async Task<ActionResult<Group>> GetGroupByName(string groupName)
@@ -82,19 +73,21 @@ namespace NEXT.GEN.Controllers
                 if (createGroupDto == null)
                     return BadRequest("Invalid group data.");
 
-                 //Check if the user (creator) exists
+                //Check if the user (creator) exists
                 //var userExists = await _context.Users.AnyAsync(u => u.Id == createGroupDto.CreatorId);
                 //if (!userExists)
                 //    return NotFound("User not found.");
 
                 // Map DTO to Group model
-                var group = new Group
-                {
-                    GroupName = createGroupDto.GroupName,
-                    Description = createGroupDto.Description,
-                    CreatorName = createGroupDto.CreatorName,
-                    //Members = new List<GroupMembers> { new GroupMembers { UserId = createGroupDto.CreatorId} }
-                };
+                //var group = new Group
+                //{
+                //    GroupName = createGroupDto.GroupName,
+                //    Description = createGroupDto.Description,
+                //    CreatorName = createGroupDto.CreatorName,
+                //    //Members = new List<GroupMembers> { new GroupMembers { UserId = createGroupDto.CreatorId} }
+                //};
+
+                var group = _mapper.Map<Group>(createGroupDto);
 
                 group.MemberCount++;
 

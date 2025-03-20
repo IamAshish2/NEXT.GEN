@@ -39,6 +39,10 @@ namespace MinimalAPIConcepts.Helper
             CreateMap<GroupMembers,GetGroupMembersDTO>();
             CreateMap<GroupMembers,JoinGroupDto>();
             CreateMap<JoinGroupDto,GroupMembers>();
+            CreateMap<CreateGroupDto,Group>();
+            CreateMap<Group,CreateGroupDto>();
+            CreateMap<GetGroupDetailsDto,Group>();
+            CreateMap<Group,GetGroupDetailsDto>();
         }
     }
 }

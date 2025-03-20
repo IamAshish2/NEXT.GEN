@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MinimalAPIConcepts.Context;
+using NEXT.GEN.Dtos.GroupDto;
 using NEXT.GEN.Models;
 using NEXT.GEN.Services.Interfaces;
 using System.Collections.Generic;
@@ -38,9 +39,19 @@ namespace NEXT.GEN.Services.Repository
         //    return await _context.Groups.AnyAsync(g => g.GroupId == groupId);
         //}
 
-        public async Task<ICollection<Group>> GetAllGroups()
+        public async Task<ICollection<GetGroupDetailsDto>> GetAllGroups()
         {
-            return await _context.Groups.OrderByDescending(g => g.GroupName).ToListAsync();
+            return await _context.Groups.OrderByDescending(g => g.GroupName)
+                .Select(g => new GetGroupDetailsDto
+                {
+                    GroupName = g.GroupName,
+                    GroupImage = g.GroupImage,
+                    Category = g.Category,
+                    Description = g.Description,
+                    MemberCount = g.MemberCount,
+                    CreatorName = g.CreatorName
+                })
+                .ToListAsync();
         }
 
         //public async Task<Group> GetGroupById(int groupId)

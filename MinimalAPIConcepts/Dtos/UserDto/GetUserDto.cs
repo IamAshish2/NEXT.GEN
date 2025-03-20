@@ -12,5 +12,8 @@ namespace NEXT.GEN.Dtos.UserDto
         public string? Address { get; set; }
         public ICollection<string>? Socials { get; set; } = new List<string>();
         public ICollection<string>? Skills { get; set; } = new List<string>();
+        // The user stats
+        //public ICollection<string>? Stats { get; set; } = new List<string>();
+
     }
 }

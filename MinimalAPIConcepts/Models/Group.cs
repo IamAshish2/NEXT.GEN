@@ -13,6 +13,8 @@ namespace NEXT.GEN.Models
         public int MemberCount { get; set; } = 0;
         public string Description { get; set; }
         // the creator of the group 
+        public string Category { get; set; }
+        public string GroupImage { get; set; }
         public string CreatorName { get; set; }
         [ForeignKey("CreatorName")]
         public User User { get; set; }
