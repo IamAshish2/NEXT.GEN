@@ -19,5 +19,7 @@ namespace NEXT.GEN.Models
         [ForeignKey("GroupName")]
         [JsonIgnore]
         public Group Group { get; set; }
+
+        public bool HasJoined { get; set; }
     }
 }

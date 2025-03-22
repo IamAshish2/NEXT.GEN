@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MinimalAPIConcepts.Context;
+using NEXT.GEN.Dtos.PostDto;
 using NEXT.GEN.Models.PostModel;
 using NEXT.GEN.Services.Interfaces;
 
@@ -29,6 +30,22 @@ namespace NEXT.GEN.Services.Repository
         public async Task<ICollection<CreatePost>> GetAllPosts()
         {
             return await _context.Posts.OrderBy(p => p.PostId).ToListAsync();
+        }
+
+        public async Task<ICollection<GetGroupPostsDto>> GetAllPostsFromGroup(string groupName)
+        {
+            return await _context.Posts.OrderBy(p => p.PostId)
+                .Where(p => p.GroupName == groupName)
+                .Select(p => new GetGroupPostsDto
+                {
+                    PostId = p.PostId,
+                    Title = p.Title,
+                    Description = p.Description,
+                    PostedDate = p.PostedDate,
+                    ImageUrls = p.ImageUrls,
+                    UserName = p.UserName,
+                })
+                .ToListAsync();
         }
 
         public async Task<ICollection<CreatePost>> GetPostsByUser(string userName)

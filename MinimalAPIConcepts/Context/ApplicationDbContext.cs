@@ -33,6 +33,7 @@ namespace MinimalAPIConcepts.Context
         {
             base.OnModelCreating(modelBuilder);
 
+
             modelBuilder.Entity<Friendships>()
                 .HasOne(f => f.User)
                 .WithMany(f => f.UserFriendships)
@@ -53,7 +54,8 @@ namespace MinimalAPIConcepts.Context
                 .HasOne(g => g.Group)
                 .WithMany(g => g.Members)
                 .HasForeignKey(g => g.GroupName)
-                .OnDelete(DeleteBehavior.Restrict);
+                //.OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
 
             // one user can join multiple groups
             modelBuilder.Entity<GroupMembers>()
@@ -61,6 +63,7 @@ namespace MinimalAPIConcepts.Context
                 .WithMany(g => g.GroupMember)
                 .HasForeignKey(g => g.UserName)
                 .OnDelete(DeleteBehavior.NoAction);
+                //.OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<GroupMembers>()
               .HasIndex(u => new { u.UserName, u.GroupName }).IsUnique();

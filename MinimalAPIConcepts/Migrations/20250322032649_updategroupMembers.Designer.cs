@@ -12,8 +12,8 @@ using MinimalAPIConcepts.Context;
 namespace NEXT.GEN.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250317133724_updatedb")]
-    partial class updatedb
+    [Migration("20250322032649_updategroupMembers")]
+    partial class updategroupMembers
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -33,9 +33,6 @@ namespace NEXT.GEN.Migrations
                     b.Property<string>("Address")
                         .HasColumnType("nvarchar(max)");
 
-                    b.PrimitiveCollection<string>("Addresses")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Bio")
                         .HasColumnType("nvarchar(max)");
 
@@ -51,6 +48,9 @@ namespace NEXT.GEN.Migrations
 
                     b.Property<string>("Password")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.PrimitiveCollection<string>("Skills")
                         .HasColumnType("nvarchar(max)");
 
                     b.PrimitiveCollection<string>("Socials")
@@ -98,11 +98,19 @@ namespace NEXT.GEN.Migrations
                     b.Property<string>("GroupName")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("CreatorName")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("GroupImage")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -127,6 +135,9 @@ namespace NEXT.GEN.Migrations
                     b.Property<string>("GroupName")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<bool>("HasJoined")
+                        .HasColumnType("bit");
 
                     b.Property<DateTime>("JoinDate")
                         .HasColumnType("datetime2");
@@ -299,7 +310,7 @@ namespace NEXT.GEN.Migrations
                     b.HasOne("NEXT.GEN.Models.Group", "Group")
                         .WithMany("Members")
                         .HasForeignKey("GroupName")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("MinimalAPIConcepts.Models.User", "User")

@@ -37,12 +37,14 @@ namespace NEXT.GEN.Services.Repository
                 .Select(g => new GetGroupMembersDTO
                 {
                     JoinDate = g.JoinDate,
-                    userName = g.UserName,
+                    HasJoined = g.HasJoined,
                     GroupName = g.Group.GroupName,
+                    userName = g.User.UserName,
                     User = new GetUserDto
                     {
                         UserName = g.User.UserName,
                         Email = g.User.Email,
+                        Course = g.User.Course
                     }
                 }).ToListAsync();
         }
@@ -88,7 +90,24 @@ namespace NEXT.GEN.Services.Repository
         public async Task<bool> IsUserAlreadyAMember(string userName,string groupName)
         {
             var userExists = await _context.GroupMembers.FirstOrDefaultAsync(g => g.UserName == userName && g.GroupName == groupName);
-            return userExists == null;
+            return userExists != null;
+        }
+
+        public async Task<bool> MakeUserAMember(string groupName,string userName)
+        {
+            var user = await _context.GroupMembers.FirstOrDefaultAsync(g => g.UserName == userName && g.GroupName == groupName);
+
+            if(user != null)
+            {
+
+                user.HasJoined = true;
+            }
+            return await Save();
+        }
+
+        public async Task<bool> DoesUserExists(string userName)
+        {
+            return await _context.Users.AnyAsync(u => u.UserName == userName);
         }
     }
 

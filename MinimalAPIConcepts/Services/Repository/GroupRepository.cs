@@ -2,6 +2,7 @@
 using MinimalAPIConcepts.Context;
 using NEXT.GEN.Dtos.GroupDto;
 using NEXT.GEN.Models;
+using NEXT.GEN.Models.PostModel;
 using NEXT.GEN.Services.Interfaces;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -49,7 +50,7 @@ namespace NEXT.GEN.Services.Repository
                     Category = g.Category,
                     Description = g.Description,
                     MemberCount = g.MemberCount,
-                    CreatorName = g.CreatorName
+                    CreatorName = g.CreatorName,
                 })
                 .ToListAsync();
         }
@@ -85,9 +86,47 @@ namespace NEXT.GEN.Services.Repository
             return await Save();
         }
 
-        public async Task<Group> GetGroupByName(string groupName)
+        public async Task<GetGroupDetailsDto> GetGroupByName(string groupName)
         {
-            return await _context.Groups.OrderBy(g => g.GroupName).FirstOrDefaultAsync(g => g.GroupName == groupName);
+            return await _context.Groups.Where(g => g.GroupName == groupName)
+                //.Select(g => g.Members.HasJoi)
+                .Select(g => new GetGroupDetailsDto
+                {
+                    GroupName = g.GroupName,
+                    GroupImage = g.GroupImage,
+                    Category = g.Category,
+                    Description = g.Description,
+                    MemberCount = g.MemberCount,
+                    CreatorName = g.CreatorName,
+                })
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<GetGroupDetailsDto> GetGroupDetailsByName(string groupName, string memberName)
+        {
+            return await _context.Groups.Where(g => g.GroupName == groupName)
+                .Select(g => new GetGroupDetailsDto
+                {
+                    GroupName = g.GroupName,
+                    GroupImage = g.GroupImage,
+                    Category = g.Category,
+                    Description = g.Description,
+                    MemberCount = g.MemberCount,
+                    CreatorName = g.CreatorName,
+                    HasJoined = g.Members.Any(g => g.UserName == memberName && g.GroupName == groupName && g.HasJoined),
+                    
+                }).FirstOrDefaultAsync();
+        }
+
+        public async Task<bool> DoesUserExists(string userName)
+        {
+            return await _context.Users.AnyAsync(u => u.UserName == userName);
+        }
+
+        public async Task<bool> CreatePost(CreatePost post)
+        {
+            await _context.Posts.AddAsync(post);
+            return await Save();
         }
     }
 }

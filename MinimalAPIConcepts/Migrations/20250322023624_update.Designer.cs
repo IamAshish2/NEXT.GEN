@@ -12,7 +12,7 @@ using MinimalAPIConcepts.Context;
 namespace NEXT.GEN.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250318150244_update")]
+    [Migration("20250322023624_update")]
     partial class update
     {
         /// <inheritdoc />
@@ -98,11 +98,19 @@ namespace NEXT.GEN.Migrations
                     b.Property<string>("GroupName")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("CreatorName")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("GroupImage")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -299,7 +307,7 @@ namespace NEXT.GEN.Migrations
                     b.HasOne("NEXT.GEN.Models.Group", "Group")
                         .WithMany("Members")
                         .HasForeignKey("GroupName")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("MinimalAPIConcepts.Models.User", "User")

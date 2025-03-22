@@ -1,4 +1,5 @@
-﻿using NEXT.GEN.Models.PostModel;
+﻿using NEXT.GEN.Dtos.PostDto;
+using NEXT.GEN.Models.PostModel;
 
 namespace NEXT.GEN.Services.Interfaces
 {
@@ -12,5 +13,11 @@ namespace NEXT.GEN.Services.Interfaces
         Task<bool> DeletePost(CreatePost post);
         Task<bool> UpdatePost(CreatePost post);
         Task<bool> SaveChanges();
+
+
+
+
+        // Post interface for groups
+        Task<ICollection<GetGroupPostsDto>> GetAllPostsFromGroup(string groupName);
     }
 }

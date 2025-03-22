@@ -43,6 +43,8 @@ namespace MinimalAPIConcepts.Helper
             CreateMap<Group,CreateGroupDto>();
             CreateMap<GetGroupDetailsDto,Group>();
             CreateMap<Group,GetGroupDetailsDto>();
+            CreateMap<UploadPostToGroup,CreatePost>();
+            CreateMap<CreatePost,UploadPostToGroup>();
         }
     }
 }

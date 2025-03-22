@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace NEXT.GEN.Migrations
 {
     /// <inheritdoc />
-    public partial class updatedb : Migration
+    public partial class update : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -23,7 +23,7 @@ namespace NEXT.GEN.Migrations
                     Course = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Socials = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Addresses = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Skills = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -65,6 +65,8 @@ namespace NEXT.GEN.Migrations
                     GroupName = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     MemberCount = table.Column<int>(type: "int", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Category = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    GroupImage = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreatorName = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
@@ -119,7 +121,7 @@ namespace NEXT.GEN.Migrations
                         column: x => x.GroupName,
                         principalTable: "Groups",
                         principalColumn: "GroupName",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_GroupMembers_Users_UserName",
                         column: x => x.UserName,

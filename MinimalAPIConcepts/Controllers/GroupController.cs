@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using NEXT.GEN.Dtos.GroupDto;
+using NEXT.GEN.Dtos.PostDto;
 using NEXT.GEN.Models;
+using NEXT.GEN.Models.PostModel;
 using NEXT.GEN.Services.Interfaces;
 
 // This controller handles the actions performed for a group
@@ -15,11 +17,13 @@ namespace NEXT.GEN.Controllers
     public class GroupsController : ControllerBase
     {
         private readonly IGroupRepository _groupRepository;
+        private readonly IGroupMemberRepository _groupMemberRepository;
         private readonly IMapper _mapper;
 
-        public GroupsController(IGroupRepository groupRepository,IMapper mapper)
+        public GroupsController(IGroupRepository groupRepository,IGroupMemberRepository groupMemberRepository, IMapper mapper)
         {
             _groupRepository = groupRepository;
+            _groupMemberRepository = groupMemberRepository;
             _mapper = mapper;
         }
 
@@ -45,13 +49,36 @@ namespace NEXT.GEN.Controllers
             }
         }
 
+        /*
         [HttpGet("get-by-groupName/{groupName}")]
-        public async Task<ActionResult<Group>> GetGroupByName(string groupName)
+        public async Task<ActionResult<GetGroupDetailsDto>> GetGroupByName(string groupName)
         {
             try
             {
                 //var group = await _groupRepository.GetGroupById(id);
                 var group = await _groupRepository.GetGroupByName(groupName);
+
+
+                if (group == null)
+                    return NotFound("Group not found.");
+
+                return Ok(group);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
+        }
+        */
+
+
+        [HttpGet("get-by-groupName")]
+        public async Task<ActionResult<GetGroupDetailsDto>> GetGroupByName([FromQuery] GetGroupMembersDto query)
+        {
+            try
+            {
+                var group = await _groupRepository.GetGroupDetailsByName(query.GroupName,query.UserName);
+
 
                 if (group == null)
                     return NotFound("Group not found.");
@@ -99,7 +126,7 @@ namespace NEXT.GEN.Controllers
 
                 await _groupRepository.Save();
 
-                return CreatedAtAction(nameof(GetGroupByName), new { GroupName = group.GroupName }, group);
+                return CreatedAtAction(nameof(GetGroupByName), new { group.GroupName }, group);
             }
             catch (Exception ex)
             {
@@ -155,7 +182,36 @@ namespace NEXT.GEN.Controllers
             }
         }
 
-        //[HttpPost]
+        [HttpPost("upload-post-to-group")]
+        public async Task<IActionResult> UploadPostToGroup([FromBody] UploadPostToGroup request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
 
+            if(! await _groupRepository.DoesGroupExist(request.GroupName)){
+                return NotFound();
+            }
+
+            if(!await _groupMemberRepository.DoesUserExists(request.UserName)){
+                return NotFound();
+            }
+
+            if(!await _groupMemberRepository.IsUserAlreadyAMember(request.UserName, request.GroupName))
+            {
+                return BadRequest("The user is not a part of the group.");
+            }
+
+            var mappedRequest = _mapper.Map<CreatePost>(request);
+
+            if(!await _groupRepository.CreatePost(mappedRequest))
+            {
+                ModelState.AddModelError("","The post was not created");
+                return BadRequest();
+            }
+
+            return NoContent();
+        }
     }
 }

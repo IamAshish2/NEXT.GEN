@@ -133,6 +133,9 @@ namespace NEXT.GEN.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<bool>("HasJoined")
+                        .HasColumnType("bit");
+
                     b.Property<DateTime>("JoinDate")
                         .HasColumnType("datetime2");
 
@@ -193,6 +196,10 @@ namespace NEXT.GEN.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("GroupName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.PrimitiveCollection<string>("ImageUrls")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -209,6 +216,8 @@ namespace NEXT.GEN.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("PostId");
+
+                    b.HasIndex("GroupName");
 
                     b.HasIndex("UserName");
 
@@ -304,7 +313,7 @@ namespace NEXT.GEN.Migrations
                     b.HasOne("NEXT.GEN.Models.Group", "Group")
                         .WithMany("Members")
                         .HasForeignKey("GroupName")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("MinimalAPIConcepts.Models.User", "User")
@@ -339,11 +348,19 @@ namespace NEXT.GEN.Migrations
 
             modelBuilder.Entity("NEXT.GEN.Models.PostModel.CreatePost", b =>
                 {
+                    b.HasOne("NEXT.GEN.Models.Group", "Group")
+                        .WithMany("Posts")
+                        .HasForeignKey("GroupName")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("MinimalAPIConcepts.Models.User", "User")
                         .WithMany("Posts")
                         .HasForeignKey("UserName")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Group");
 
                     b.Navigation("User");
                 });
@@ -408,6 +425,8 @@ namespace NEXT.GEN.Migrations
             modelBuilder.Entity("NEXT.GEN.Models.Group", b =>
                 {
                     b.Navigation("Members");
+
+                    b.Navigation("Posts");
                 });
 
             modelBuilder.Entity("NEXT.GEN.Models.PostModel.CreatePost", b =>
