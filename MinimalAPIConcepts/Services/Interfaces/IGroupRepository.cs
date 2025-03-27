@@ -7,6 +7,7 @@ namespace NEXT.GEN.Services.Interfaces
 {
     public interface IGroupRepository
     {
+         Task<bool> UpdateMembers(string groupName);
         Task<ICollection<GetGroupDetailsDto>> GetAllGroups();
         //Task<Group> GetGroupById(int groupId);
         Task<GetGroupDetailsDto> GetGroupByName(string groupName);

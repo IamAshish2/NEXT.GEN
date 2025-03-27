@@ -15,7 +15,39 @@ using System.Net;
 using System.Net.Mail;
 using System.Text;
 
+// google
+using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authentication.Cookies;
+
 var builder = WebApplication.CreateBuilder(args);
+
+// 
+//builder.Services.AddAuthentication(options =>
+//{
+//    options.DefaultScheme  =  CookieAuthenticationDefaults.AuthenticationScheme;
+//    options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
+//})
+//    .AddCookie()
+//    .AddGoogle(GoogleDefaults.AuthenticationScheme, options =>
+//    {
+//        options.ClientId = builder.Configuration.GetSection("GoogleKeys:ClientId").Value;
+//        options.ClientSecret = builder.Configuration.GetSection("GoogleKeys:CLIENTSECRET").Value;
+//    })
+//    ;
+
+// Add authentication
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
+})
+.AddCookie()
+.AddGoogle(googleOptions =>
+{
+    googleOptions.ClientId = builder.Configuration["GoogleKeys:ClientId"];
+    googleOptions.ClientSecret = builder.Configuration["GoogleKeys:CLIENTSECRET"];
+    googleOptions.CallbackPath = "/signin-google"; // This is the default value
+});
 
 // for resolving multiple object cycles
 builder.Services.Configure<JsonOptions>(
@@ -122,6 +154,8 @@ builder.Services.AddScoped<IpostRepository, PostRepository>();
 builder.Services.AddScoped<IGroupRepository,GroupRepository>();
 builder.Services.AddScoped<IpostRepository,PostRepository>();
 builder.Services.AddScoped<IGroupMemberRepository,GroupMemberRepository>();
+builder.Services.AddScoped<ILikeRepository, LikeRepository>();
+builder.Services.AddScoped<ICommentRepository,CommentRepository>();
 
 
 

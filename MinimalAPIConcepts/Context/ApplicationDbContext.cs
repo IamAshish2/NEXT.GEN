@@ -84,6 +84,7 @@ namespace MinimalAPIConcepts.Context
                 .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<Likes>().HasKey(l => l.LikeId);
+
             modelBuilder.Entity<Likes>()
                .HasOne(c => c.User)
                .WithMany(c => c.Likes)

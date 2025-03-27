@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Azure.Core;
 using Microsoft.AspNetCore.Mvc;
 using NEXT.GEN.Dtos.GroupDto;
 using NEXT.GEN.Dtos.PostDto;
@@ -122,7 +123,29 @@ namespace NEXT.GEN.Controllers
                 if (!created)
                     return StatusCode(500, "Something went wrong while creating the group.");
 
-                group.Members = new List<GroupMembers> { new GroupMembers { UserName = createGroupDto.CreatorName } };
+                // check this
+                /*
+                 * when a user creates a group, he/she should automatically be the group member and the stattus should be of joined.
+                 * does the below assignment does the task of adding and joining the creator of the group?
+                 */
+                //group.Members = new List<GroupMembers> { new GroupMembers { UserName = createGroupDto.CreatorName, GroupName = createGroupDto.GroupName } };
+
+                var newMember = _mapper.Map<GroupMembers>(group);
+                newMember.UserName = group.CreatorName;
+
+                if (!await _groupMemberRepository.JoinGroup(newMember))
+                {
+                    ModelState.AddModelError("error", "The request could not be processed at the moment.");
+                    return BadRequest(ModelState);
+                }
+
+                if (!await _groupMemberRepository.MakeUserAMember(group.GroupName, group.CreatorName))
+                {
+                    ModelState.AddModelError("error", "The user add process failed.");
+                    await _groupMemberRepository.RemoveMember(newMember);
+                    return BadRequest(ModelState);
+                }
+
 
                 await _groupRepository.Save();
 

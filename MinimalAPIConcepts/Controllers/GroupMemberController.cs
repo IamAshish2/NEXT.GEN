@@ -16,12 +16,14 @@ namespace NEXT.GEN.Controllers
     public class GroupMemberController : ControllerBase
     {
         private readonly IGroupMemberRepository _groupMemberRepository;
+        private readonly IGroupRepository _groupRepository;
         private readonly IMapper _mapper;
         private readonly ILogger<GroupMembers> _logger;
 
-        public GroupMemberController(IGroupMemberRepository groupMemberRepository, IMapper mapper, ILogger<GroupMembers> logger)
+        public GroupMemberController(IGroupMemberRepository groupMemberRepository, IGroupRepository groupRepository, IMapper mapper, ILogger<GroupMembers> logger)
         {
             _groupMemberRepository = groupMemberRepository;
+            _groupRepository = groupRepository;
             _mapper = mapper;
             _logger = logger;
         }
@@ -82,12 +84,13 @@ namespace NEXT.GEN.Controllers
 
             // check if the user is already a memeber
             var isAMember = await _groupMemberRepository.IsUserAlreadyAMember(request.userName,request.GroupName);
-            if (!isAMember)
+            if (isAMember)
                 return BadRequest("The user is already a part of the group.");
 
             // send a join request to the group for the given user
             var mappedRequest = _mapper.Map<GroupMembers>(request);
             mappedRequest.JoinDate = DateTime.Now;
+            
 
 
             if (! await _groupMemberRepository.JoinGroup(mappedRequest)) {
@@ -99,6 +102,12 @@ namespace NEXT.GEN.Controllers
             {
                 ModelState.AddModelError("error", "The user add process failed.");
                await  _groupMemberRepository.RemoveMember(mappedRequest);
+                return BadRequest(ModelState);
+            }
+
+           if(! await _groupRepository.UpdateMembers(mappedRequest.GroupName)){
+                ModelState.AddModelError("error", "The group member status  could not be updated.");
+                await _groupMemberRepository.RemoveMember(mappedRequest);
                 return BadRequest(ModelState);
             }
 

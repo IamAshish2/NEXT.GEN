@@ -128,5 +128,12 @@ namespace NEXT.GEN.Services.Repository
             await _context.Posts.AddAsync(post);
             return await Save();
         }
+
+        public async Task<bool> UpdateMembers(string groupName)
+        {
+            var groups  = await _context.Groups.FirstOrDefaultAsync(g => g.GroupName == groupName);
+            groups.MemberCount++;
+            return await Save();    
+        }
     }
 }

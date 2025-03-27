@@ -59,9 +59,10 @@ namespace NEXT.GEN.Services.Repository
 
         // this is the Leave group
 
-        public Task<bool> RemoveMember(GroupMembers groupMember)
+        public async Task<bool> RemoveMember(GroupMembers groupMember)
         {
-            throw new NotImplementedException();
+            _context.GroupMembers.Remove(groupMember);
+            return await Save();
         }
 
         public async Task<bool> Save()

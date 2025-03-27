@@ -14,6 +14,7 @@ namespace NEXT.GEN.Services.Interfaces
         Task<bool> UpdatePost(CreatePost post);
         Task<bool> SaveChanges();
 
+        Task<bool> DoesPostExist(int postId);
 
 
 

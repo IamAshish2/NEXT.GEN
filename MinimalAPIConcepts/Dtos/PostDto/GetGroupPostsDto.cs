@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using NEXT.GEN.Dtos.CommentDto;
+using System.ComponentModel.DataAnnotations;
 
 namespace NEXT.GEN.Dtos.PostDto
 {
@@ -10,5 +11,8 @@ namespace NEXT.GEN.Dtos.PostDto
         public DateTime PostedDate { get; set; }
         public List<string> ImageUrls { get; set; } = new List<string>();
         public string UserName { get; set; }
+        public bool IsLiked { get; set; }
+        public int LikeCount { get; set; }
+        public List<GetPostCommentsDto> Comments { get; set; }
     }
 }
