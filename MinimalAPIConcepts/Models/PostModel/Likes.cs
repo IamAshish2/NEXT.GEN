@@ -17,6 +17,10 @@ namespace NEXT.GEN.Models.PostModel
         [ForeignKey("UserName")]
         public User User { get; set; }
 
+         // the group name is optional as the users can either interact with group posts or the posts of the user.
+        public string? GroupName { get; set; }
+
+
         public DateTime LikedDate { get; set; } 
     }
 }

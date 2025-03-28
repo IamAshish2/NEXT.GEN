@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MinimalAPIConcepts.Context;
 
@@ -11,9 +12,11 @@ using MinimalAPIConcepts.Context;
 namespace NEXT.GEN.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250322032649_updategroupMembers")]
+    partial class updategroupMembers
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -164,7 +167,7 @@ namespace NEXT.GEN.Migrations
                     b.Property<DateTime>("CommentDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Content")
+                    b.Property<string>("CommentText")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -196,10 +199,6 @@ namespace NEXT.GEN.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("GroupName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
                     b.PrimitiveCollection<string>("ImageUrls")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -216,8 +215,6 @@ namespace NEXT.GEN.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("PostId");
-
-                    b.HasIndex("GroupName");
 
                     b.HasIndex("UserName");
 
@@ -258,9 +255,6 @@ namespace NEXT.GEN.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LikeId"));
-
-                    b.Property<string>("GroupName")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("LikedDate")
                         .HasColumnType("datetime2");
@@ -351,19 +345,11 @@ namespace NEXT.GEN.Migrations
 
             modelBuilder.Entity("NEXT.GEN.Models.PostModel.CreatePost", b =>
                 {
-                    b.HasOne("NEXT.GEN.Models.Group", "Group")
-                        .WithMany("Posts")
-                        .HasForeignKey("GroupName")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("MinimalAPIConcepts.Models.User", "User")
                         .WithMany("Posts")
                         .HasForeignKey("UserName")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.Navigation("Group");
 
                     b.Navigation("User");
                 });
@@ -428,8 +414,6 @@ namespace NEXT.GEN.Migrations
             modelBuilder.Entity("NEXT.GEN.Models.Group", b =>
                 {
                     b.Navigation("Members");
-
-                    b.Navigation("Posts");
                 });
 
             modelBuilder.Entity("NEXT.GEN.Models.PostModel.CreatePost", b =>

@@ -21,6 +21,11 @@ namespace NEXT.GEN.Models.PostModel
         [ForeignKey("UserName")]
         public User User { get; set; }
 
+        // one group can have many posts
+        public string GroupName { get; set; }
+        [ForeignKey("GroupName")]
+        public Group Group { get; set; }
+
         // one post can have many likes, dislikes and comments.
         public ICollection<Likes> Likes { get; set; } = new List<Likes>();
         public ICollection<Dislike> Dislikes { get; set; } = new List<Dislike>();

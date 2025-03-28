@@ -1,12 +1,19 @@
-﻿using NEXT.GEN.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using NEXT.GEN.Dtos.GroupDto;
+using NEXT.GEN.Models;
+using NEXT.GEN.Models.PostModel;
 
 namespace NEXT.GEN.Services.Interfaces
 {
     public interface IGroupRepository
     {
-        Task<ICollection<Group>> GetAllGroups();
+         Task<bool> UpdateMembers(string groupName);
+        Task<ICollection<GetGroupDetailsDto>> GetAllGroups();
         //Task<Group> GetGroupById(int groupId);
-        Task<Group> GetGroupByName(string groupName);
+        Task<GetGroupDetailsDto> GetGroupByName(string groupName);
+
+        //  This endpoint returns gropDetails with hasJoined value for members
+        Task<GetGroupDetailsDto> GetGroupDetailsByName(string groupName,string memberName);
         Task<bool> DoesGroupExist(string groupName);
         Task<bool> DeleteGroup(string groupName);
 
@@ -19,5 +26,10 @@ namespace NEXT.GEN.Services.Interfaces
         // getGroupMembers
         Task<bool> UpdateGroup(Group group);
         Task<bool> Save();
+        Task<bool> DoesUserExists(string userName);
+
+
+        // create post in group.
+        Task<bool> CreatePost(CreatePost post);
     }
 }

@@ -12,25 +12,90 @@ namespace NEXT.GEN.Controllers
     {
         private readonly IpostRepository _postRepository;
         private readonly IMapper _mapper;
+        private readonly IGroupRepository _groupRepository;
+        private readonly IGroupMemberRepository _groupMemberRepository;
+        private readonly ILogger<CreatePost> _logger;
 
-        public PostController(IpostRepository postRepository, IMapper mapper)
+        public PostController(
+            IpostRepository postRepository,
+            IMapper mapper,IGroupRepository groupRepository,
+            IGroupMemberRepository groupMemberRepository,
+            ILogger<CreatePost> logger
+            )
         {
             _postRepository = postRepository;
             _mapper = mapper;
+            _groupRepository = groupRepository;
+            _groupMemberRepository = groupMemberRepository;
+            _logger = logger;
         }
 
-        [HttpGet("get-all-posts")]
-        public async Task<IActionResult> GetAllPosts()
+
+
+    // i need to return all the posts made to a group
+    // returns all the posts made in a group 
+        [HttpGet("get-all-group-posts/{groupName}")]
+        public async Task<ActionResult<ICollection<GetGroupPostsDto>>> GetAllPosts(string groupName)
         {
+            if (string.IsNullOrWhiteSpace(groupName))
+            {
+                return BadRequest("Group name is required.");
+            }
+
+            if (! await _groupMemberRepository.GroupExists(groupName)){
+                return NotFound(); 
+            }
+
             try
             {
-                var posts = await _postRepository.GetAllPosts();
+                var posts = await _postRepository.GetAllPostsFromGroup(groupName);
+
+                // if there are no posts in the group then, return an empty list
+                if (posts == null || posts.Count == 0)
+                {
+                    return Ok(new List<GetGroupPostsDto>());
+                }
+
                 return Ok(posts);
+            }
+            catch (ArgumentException ex)
+            {
+                _logger.LogError(ex, $"Argument exception occurred while getting posts for group: {groupName}");
+                return BadRequest(ex.Message);
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogError(ex, $"Invalid operation exception occurred while getting posts for group: {groupName}");
+                return BadRequest(ex.Message);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"An error occurred: {ex.Message}");
+                _logger.LogError(ex, $"An unexpected error occurred while getting posts for group: {groupName}");
+                return StatusCode(500, "An internal server error occurred.");
             }
+        }
+
+
+        [HttpGet("get-post-details-by-id/{postId}")]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(500)]
+        public async Task<ActionResult<GetGroupPostsDto>> GetPostDetailsById(int postId)
+        {
+            // check if the post exists
+            
+            if(! await _postRepository.DoesPostExist(postId))
+            {
+                return BadRequest("The post was not found.");
+            }
+
+            var postDetails = await _postRepository.GetPostDetailsById(postId);
+            if(postDetails == null)
+            {
+                return Ok(new GetGroupPostsDto { });
+            }
+
+            return Ok(postDetails);
         }
 
         [HttpGet("get-user/{userName}")]

@@ -12,8 +12,8 @@ using MinimalAPIConcepts.Context;
 namespace NEXT.GEN.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250318150244_update")]
-    partial class update
+    [Migration("20250324140429_databaseUpdate")]
+    partial class databaseUpdate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -98,11 +98,19 @@ namespace NEXT.GEN.Migrations
                     b.Property<string>("GroupName")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("CreatorName")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("GroupImage")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -127,6 +135,9 @@ namespace NEXT.GEN.Migrations
                     b.Property<string>("GroupName")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<bool>("HasJoined")
+                        .HasColumnType("bit");
 
                     b.Property<DateTime>("JoinDate")
                         .HasColumnType("datetime2");
@@ -188,6 +199,10 @@ namespace NEXT.GEN.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("GroupName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.PrimitiveCollection<string>("ImageUrls")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -204,6 +219,8 @@ namespace NEXT.GEN.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("PostId");
+
+                    b.HasIndex("GroupName");
 
                     b.HasIndex("UserName");
 
@@ -244,6 +261,9 @@ namespace NEXT.GEN.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LikeId"));
+
+                    b.Property<string>("GroupName")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("LikedDate")
                         .HasColumnType("datetime2");
@@ -299,7 +319,7 @@ namespace NEXT.GEN.Migrations
                     b.HasOne("NEXT.GEN.Models.Group", "Group")
                         .WithMany("Members")
                         .HasForeignKey("GroupName")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("MinimalAPIConcepts.Models.User", "User")
@@ -334,11 +354,19 @@ namespace NEXT.GEN.Migrations
 
             modelBuilder.Entity("NEXT.GEN.Models.PostModel.CreatePost", b =>
                 {
+                    b.HasOne("NEXT.GEN.Models.Group", "Group")
+                        .WithMany("Posts")
+                        .HasForeignKey("GroupName")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("MinimalAPIConcepts.Models.User", "User")
                         .WithMany("Posts")
                         .HasForeignKey("UserName")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Group");
 
                     b.Navigation("User");
                 });
@@ -403,6 +431,8 @@ namespace NEXT.GEN.Migrations
             modelBuilder.Entity("NEXT.GEN.Models.Group", b =>
                 {
                     b.Navigation("Members");
+
+                    b.Navigation("Posts");
                 });
 
             modelBuilder.Entity("NEXT.GEN.Models.PostModel.CreatePost", b =>

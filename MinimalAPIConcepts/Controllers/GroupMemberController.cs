@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 using NEXT.GEN.Dtos.GroupDto;
 using NEXT.GEN.Dtos.GroupMembersDto;
@@ -15,12 +16,14 @@ namespace NEXT.GEN.Controllers
     public class GroupMemberController : ControllerBase
     {
         private readonly IGroupMemberRepository _groupMemberRepository;
+        private readonly IGroupRepository _groupRepository;
         private readonly IMapper _mapper;
         private readonly ILogger<GroupMembers> _logger;
 
-        public GroupMemberController(IGroupMemberRepository groupMemberRepository, IMapper mapper, ILogger<GroupMembers> logger)
+        public GroupMemberController(IGroupMemberRepository groupMemberRepository, IGroupRepository groupRepository, IMapper mapper, ILogger<GroupMembers> logger)
         {
             _groupMemberRepository = groupMemberRepository;
+            _groupRepository = groupRepository;
             _mapper = mapper;
             _logger = logger;
         }
@@ -68,6 +71,12 @@ namespace NEXT.GEN.Controllers
         {
             if (!ModelState.IsValid) return BadRequest("The request was incomplete");
 
+            var userExists = await _groupMemberRepository.DoesUserExists(request.userName);
+            if (!userExists)
+            {
+                return BadRequest();
+            }
+
             // check if the group exists
             var groupExists = await _groupMemberRepository.GroupExists(request.GroupName);
             if (!groupExists)
@@ -75,45 +84,80 @@ namespace NEXT.GEN.Controllers
 
             // check if the user is already a memeber
             var isAMember = await _groupMemberRepository.IsUserAlreadyAMember(request.userName,request.GroupName);
-            if (!isAMember)
+            if (isAMember)
                 return BadRequest("The user is already a part of the group.");
 
             // send a join request to the group for the given user
-            var mappedUser = _mapper.Map<GroupMembers>(request);
+            var mappedRequest = _mapper.Map<GroupMembers>(request);
+            mappedRequest.JoinDate = DateTime.Now;
+            
 
-            if (! await _groupMemberRepository.JoinGroup(mappedUser)) {
+
+            if (! await _groupMemberRepository.JoinGroup(mappedRequest)) {
                 ModelState.AddModelError("error","The request could not be processed at the moment.");
+                return BadRequest(ModelState);
+            }
+
+            if(!await _groupMemberRepository.MakeUserAMember(request.GroupName, request.userName))
+            {
+                ModelState.AddModelError("error", "The user add process failed.");
+               await  _groupMemberRepository.RemoveMember(mappedRequest);
+                return BadRequest(ModelState);
+            }
+
+           if(! await _groupRepository.UpdateMembers(mappedRequest.GroupName)){
+                ModelState.AddModelError("error", "The group member status  could not be updated.");
+                await _groupMemberRepository.RemoveMember(mappedRequest);
                 return BadRequest(ModelState);
             }
 
             return NoContent();
         }
 
-        // join group
-        //[HttpPost("join-group")]
-        //[ProducesResponseType(typeof(bool) , 200)]
-        //[ProducesResponseType(404)]
-        //[ProducesResponseType(500)]
-        //public async Task<ActionResult> JoinGroup([FromBody] JoinGroupDto joinGroup)
-        //{
-        //    try
-        //    {
-        //        var doesGroupExist = await _groupMemberRepository.GroupExists(joinGroup.GroupName);
-        //        if (!doesGroupExist)
-        //        {
-        //            return NotFound("The group was not found.");
-        //        }
+       // //join group
+       //[HttpPost("join-group")]
+       // [ProducesResponseType(typeof(bool), 200)]
+       // [ProducesResponseType(404)]
+       // [ProducesResponseType(500)]
+       // public async Task<ActionResult> JoinGroup([FromBody] JoinGroupDto joinGroup)
+       // {
+       //     try
+       //     {
+       //         var doesGroupExist = await _groupMemberRepository.GroupExists(joinGroup.GroupName);
+       //         if (!doesGroupExist)
+       //         {
+       //             return NotFound("The group was not found.");
+       //         }
 
-        //        var doesUserExist = await _groupMemberRepository.IsUserAlreadyAMember(joinGroup.UserId,joinGroup.GroupName);
+       //         if(!await _groupMemberRepository.IsUserAlreadyAMember(joinGroup.userName, joinGroup.GroupName))
+       //         {
+       //             return BadRequest("User is already a member.");
+       //         }
 
+       //         var mappedRequest = _mapper.Map<GroupMembers>(joinGroup);
+       //         mappedRequest.JoinDate = DateTime.Now;
 
-        //    }
-        //    catch (Exception ex)
-        //    {
+       //         if(!await _groupMemberRepository.JoinGroup(mappedRequest))
+       //         {
+       //             ModelState.AddModelError("","An error occured while joining the group.");
+       //             return BadRequest(ModelState);
+       //         }
 
-        //        throw;
-        //    }
-        //}
+       //         if(!await _groupMemberRepository.MakeUserAMember(joinGroup.GroupName, joinGroup.userName))
+       //         {
+       //             await _groupMemberRepository.RemoveMember(mappedRequest);
+       //             return BadRequest();
+       //         }
+
+       //         return Ok();
+
+       //     }
+       //     catch (Exception ex)
+       //     {
+
+       //         throw;
+       //     }
+       // }
 
         //// Remove a Member (Admin Only)
         //[HttpDelete("remove/{userId}")]

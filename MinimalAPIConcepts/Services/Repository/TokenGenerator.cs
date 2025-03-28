@@ -22,11 +22,11 @@ namespace MinimalAPIConcepts.Services.Repository
             var claims = new[]
             {
                 new Claim(JwtRegisteredClaimNames.Sub, userName),
-                new Claim(ClaimTypes.Email,Email),
-                new Claim(ClaimTypes.Name,userName)
             };
 
+            //  the custom key that we have set in the appsettings.json
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Key));
+            //create signingCredentials and hash it with a algorithm.
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
             var token = new JwtSecurityToken(
                 issuer: _jwtSettings.Issuer,
@@ -37,6 +37,42 @@ namespace MinimalAPIConcepts.Services.Repository
                 );
 
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        public ClaimsPrincipal ValidateToken(string token)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.UTF8.GetBytes(_jwtSettings.Key);
+
+            try
+            {
+                var validationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = _jwtSettings.Issuer,
+                    ValidAudience = _jwtSettings.Audience,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ClockSkew = TimeSpan.Zero
+                };
+
+                var principal = tokenHandler.ValidateToken(token, validationParameters, out SecurityToken validatedToken);
+
+                if(validatedToken is JwtSecurityToken)
+                {
+                    return principal;
+                }
+
+                return null;
+            }
+            catch(Exception ex)
+            {
+                return null;
+            }
+            
+
         }
     }
 }
