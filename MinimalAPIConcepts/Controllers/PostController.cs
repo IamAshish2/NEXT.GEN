@@ -75,6 +75,29 @@ namespace NEXT.GEN.Controllers
             }
         }
 
+
+        [HttpGet("get-post-details-by-id/{postId}")]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(500)]
+        public async Task<ActionResult<GetGroupPostsDto>> GetPostDetailsById(int postId)
+        {
+            // check if the post exists
+            
+            if(! await _postRepository.DoesPostExist(postId))
+            {
+                return BadRequest("The post was not found.");
+            }
+
+            var postDetails = await _postRepository.GetPostDetailsById(postId);
+            if(postDetails == null)
+            {
+                return Ok(new GetGroupPostsDto { });
+            }
+
+            return Ok(postDetails);
+        }
+
         [HttpGet("get-user/{userName}")]
         public async Task<IActionResult> GetPostsByUser(string userName)
 

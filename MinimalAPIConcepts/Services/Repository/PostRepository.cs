@@ -60,12 +60,38 @@ namespace NEXT.GEN.Services.Repository
                     Comments = p.Comment.Select(c => new GetPostCommentsDto
                     {
                         CommentId = c.CommentId,
-                        CommentText = c.CommentText,
+                        Content = c.Content,
                         UserName = c.UserName,
                         CommentDate = c.CommentDate
                     }).ToList()
                 })
                 .ToListAsync();
+        }
+
+        // This method returns a collection of 
+        public async Task<GetGroupPostsDto> GetPostDetailsById(int postId)
+        {
+            return await _context.Posts.Where(p => p.PostId == postId)
+                .Include(p => p.Comment)
+                .Select(p => new GetGroupPostsDto
+                {
+                    PostId = p.PostId,
+                    Title = p.Title,
+                    Description = p.Description,
+                    PostedDate = p.PostedDate,
+                    ImageUrls = p.ImageUrls,
+                    UserName = p.UserName,
+
+                    IsLiked = p.Likes.Any(l => l.GroupName == p.GroupName && l.PostId == p.PostId),
+                    LikeCount = p.Likes.Count(l => l.GroupName == p.GroupName && l.PostId == p.PostId),
+                    Comments = p.Comment.Select(c => new GetPostCommentsDto
+                    {
+                        CommentId = c.CommentId,
+                        Content = c.Content,
+                        UserName = c.UserName,
+                        CommentDate = c.CommentDate
+                    }).ToList()
+                }).FirstOrDefaultAsync();
         }
 
         public async Task<ICollection<CreatePost>> GetPostsByUser(string userName)

@@ -6,7 +6,7 @@ namespace NEXT.GEN.Dtos.CommentDto
 {
     public class CreateCommentDto
     {
-        public string CommentText { get; set; }
+        public string Content { get; set; }
         public string UserName { get; set; }
         public int PostId { get; set; }
         public DateTime CommentDate { get; set; }

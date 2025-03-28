@@ -20,5 +20,6 @@ namespace NEXT.GEN.Services.Interfaces
 
         // Post interface for groups
         Task<ICollection<GetGroupPostsDto>> GetAllPostsFromGroup(string groupName);
+        Task<GetGroupPostsDto> GetPostDetailsById(int postId);
     }
 }

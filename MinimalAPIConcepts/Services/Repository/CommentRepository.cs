@@ -51,7 +51,7 @@ namespace NEXT.GEN.Services.Repository
                 .Select(c => new GetPostCommentsDto
                 {
                     CommentId = c.CommentId,
-                    CommentText = c.CommentText,
+                    Content = c.Content,
                     UserName = c.UserName,
                     CommentDate = c.CommentDate
                 })
