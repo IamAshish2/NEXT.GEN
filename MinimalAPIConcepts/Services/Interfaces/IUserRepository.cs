@@ -1,5 +1,6 @@
 ﻿using MinimalAPIConcepts.Models;
 using NEXT.GEN.Dtos.UserDto;
+using System.Security.Claims;
 
 namespace MinimalAPIConcepts.Services.Interfaces
 {
@@ -14,5 +15,8 @@ namespace MinimalAPIConcepts.Services.Interfaces
         Task<bool> isUserNameInUse(string userName);
         Task<bool> checkIfUserExists(string UserName);
         Task<bool> SaveAsync();
+
+
+        Task<string> LoginWithGoogle(ClaimsPrincipal? claimsPrincipal);
     }
 }

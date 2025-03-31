@@ -61,7 +61,7 @@ namespace NEXT.GEN.Controllers
                 return Ok("new Friend added.");
 
             }
-            catch (Exception)
+            catch (System.Exception)
             {
 
                 throw;
@@ -88,7 +88,7 @@ namespace NEXT.GEN.Controllers
 
                 return friendships;
             }
-            catch (Exception ex)
+            catch (System.Exception ex)
             {
                 return BadRequest();
             }
@@ -116,7 +116,7 @@ namespace NEXT.GEN.Controllers
 
                 return Ok("User successfully removed.");
             }
-            catch (Exception ex)
+            catch (System.Exception ex)
             {
                 return BadRequest();
             }

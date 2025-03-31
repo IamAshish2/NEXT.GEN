@@ -18,44 +18,34 @@ using System.Text;
 // google
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Identity;
+using Azure.Core;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 
+// Add authentication
 //builder.Services.AddAuthentication(options =>
 //{
-//    options.DefaultScheme  =  CookieAuthenticationDefaults.AuthenticationScheme;
+//    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
 //    options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
 //})
-//    .AddCookie()
-//    .AddGoogle(GoogleDefaults.AuthenticationScheme, options =>
-//    {
-//        options.ClientId = builder.Configuration.GetSection("GoogleKeys:ClientId").Value;
-//        options.ClientSecret = builder.Configuration.GetSection("GoogleKeys:CLIENTSECRET").Value;
-//    })
-//    ;
+//.AddCookie()
+//.AddGoogle(googleOptions =>
+//{
+//    googleOptions.ClientId = builder.Configuration["GoogleKeys:ClientId"];
+//    googleOptions.ClientSecret = builder.Configuration["GoogleKeys:CLIENTSECRET"];
+//    googleOptions.CallbackPath = "/signin-google"; // This is the default value
+//});
 
-// Add authentication
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
-})
-.AddCookie()
-.AddGoogle(googleOptions =>
-{
-    googleOptions.ClientId = builder.Configuration["GoogleKeys:ClientId"];
-    googleOptions.ClientSecret = builder.Configuration["GoogleKeys:CLIENTSECRET"];
-    googleOptions.CallbackPath = "/signin-google"; // This is the default value
-});
+builder.Services.AddHttpContextAccessor();
 
 // for resolving multiple object cycles
-builder.Services.Configure<JsonOptions>(
-    options =>
-    {
-        options.SerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
-        //options.SerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
-    });
+//builder.Services.Configure<JsonOptions>(
+//    options =>
+//    {
+//        options.SerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+//        //options.SerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
+//    });
 
 // Add auto mapper configuration
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
@@ -73,32 +63,81 @@ builder.Services.AddFluentEmail(smtp.FromEmail,smtp.FromName)
 // adding the cors policy for all origins default.
 builder.Services.AddCors( options => 
             options.AddPolicy("AllowAllOrigins",
-            builder => builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod())            
+            builder => builder.AllowAnyHeader().AllowAnyMethod().AllowCredentials().WithOrigins("http://localhost:5173"))
 );
 
 // Add Jwt configuration
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
 
+//builder.Services.AddAuthentication(options =>
+//{
+//    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+//    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+//})
+//    .AddCookie()
+//    .AddGoogle(options =>
+//    {
+//        var clientId = builder.Configuration["Authentication:Google:ClientId"];
+
+//        // check if the clientId is null
+//        if(clientId == null)
+//        {
+//            throw new ArgumentNullException(nameof(clientId));
+//        }
+
+//        var clientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+
+//        if(clientSecret == null)
+//        {
+//            throw new ArgumentNullException(nameof(clientSecret));  
+//        }
+
+//        options.ClientId = clientId;
+//        options.ClientSecret = clientSecret;
+//        options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+//    })
+//.AddJwtBearer(options =>
+//{
+//    options.TokenValidationParameters = new TokenValidationParameters
+//    {
+//        ValidateIssuer = true,
+//        ValidateAudience = true,
+//        ValidateLifetime = true,
+//        ValidateIssuerSigningKey = true,
+//        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+//        ValidAudience = builder.Configuration["Jwt:Audience"],
+//        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+//    };
+//});
+
+// add service for use of IdentityUser class 
+builder.Services.AddIdentity<User, IdentityRole>()
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders();
+
 builder.Services.AddAuthentication(options =>
 {
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
 })
-.AddJwtBearer(options =>
+.AddCookie(options =>
 {
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = builder.Configuration["Jwt:Issuer"],
-        ValidAudience = builder.Configuration["Jwt:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
-    };
-});
+    // Increase cookie expiration to handle the full OAuth flow
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+    options.Cookie.Name = "GoogleAuth";
+    options.Cookie.HttpOnly = true;
 
-//builder.Services.AddAuthorization();
+    //the cookie is sent with requests from the same site and during top-level navigations to the cookie's domain
+    //from a third-party site, helping to mitigate Cross-Site Request Forgery (CSRF) attacks. 
+    options.Cookie.SameSite = SameSiteMode.Lax; 
+})
+.AddGoogle(options =>
+{
+    options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
+    options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+    options.SaveTokens = true;
+    options.UsePkce = true; // For OAuth2 providers that support it
+});
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>

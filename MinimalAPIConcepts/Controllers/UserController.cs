@@ -4,7 +4,7 @@ using MinimalAPIConcepts.Dtos.UserDto;
 using MinimalAPIConcepts.Models;
 using MinimalAPIConcepts.Services.Interfaces;
 using NEXT.GEN.Dtos.UserDto;
-using NEXT.GEN.Models;
+using NEXT.GEN.Exception;
 
 namespace MinimalAPIConcepts.Controllers
 {

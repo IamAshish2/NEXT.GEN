@@ -1,12 +1,10 @@
 ﻿using AutoMapper;
-using Azure.Core;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MinimalAPIConcepts.Services.Interfaces;
 using NEXT.GEN.Dtos.CommentDto;
 using NEXT.GEN.Models.PostModel;
 using NEXT.GEN.Services.Interfaces;
-using NEXT.GEN.Services.Repository;
+using System;
 
 namespace NEXT.GEN.Controllers
 {
@@ -74,7 +72,7 @@ namespace NEXT.GEN.Controllers
                 }
 
                 return Ok(postComments);
-            } catch(Exception ex)
+            } catch(System.Exception ex)
             {
                 return BadRequest(ModelState);
             }

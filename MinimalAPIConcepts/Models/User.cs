@@ -1,20 +1,20 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
 using NEXT.GEN.Models;
 using NEXT.GEN.Models.PostModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace MinimalAPIConcepts.Models
 {
-    public class User
+    public class User : IdentityUser
     {
         [Key]
-        public string? UserName { get; set; }
+        //public string? UserName { get; set; }
         public string? FullName { get; set; }
 
         [Required, EmailAddress]
-        public string? Email { get; set; }
+        //public string? Email { get; set; }
 
-        [Required]
+        //[Required]
         public string Password { get; set; } = string.Empty!;
 
         // some user details

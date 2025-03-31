@@ -52,7 +52,7 @@ namespace NEXT.GEN.Controllers
 
                 return _mapper.Map<List<GetGroupMembersDTO>>(getGroupMembers);
             }
-            catch (Exception ex)
+            catch (System.Exception ex)
             {
                 // _logger.LogError(ex, "Error retrieving group members for group {GroupId}", groupId);
 
