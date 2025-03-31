@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -7,7 +10,7 @@ using MinimalAPIConcepts.Dtos.UserDto;
 using MinimalAPIConcepts.Models;
 using MinimalAPIConcepts.Services.Interfaces;
 using NEXT.GEN.Dtos.UserDto;
-using NEXT.GEN.Models;
+using NEXT.GEN.Exception;
 using System.Security.Claims;
 
 namespace MinimalAPIConcepts.Controllers
@@ -18,13 +21,17 @@ namespace MinimalAPIConcepts.Controllers
     {
         
         private readonly ApplicationDbContext _context;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ITokenGenerator _tokenGenerator;
+        private readonly IUserRepository _userRepository;
         private readonly JwtSettings _jwtSettings;
 
-        public AuthController(ApplicationDbContext context,ITokenGenerator tokenGenerator, IOptions<JwtSettings> jwtSettings)
+        public AuthController(ApplicationDbContext context, IHttpContextAccessor  httpContextAccessor ,ITokenGenerator tokenGenerator, IOptions<JwtSettings> jwtSettings, IUserRepository userRepository)
         {
             _context = context;
+            _httpContextAccessor = httpContextAccessor;
             _tokenGenerator = tokenGenerator;
+            _userRepository = userRepository;
             _jwtSettings = jwtSettings.Value;
         }
 
@@ -118,6 +125,36 @@ namespace MinimalAPIConcepts.Controllers
             }
 
             return Ok(new { userName});
+        }
+
+
+        [HttpGet("/api/account/login/google")]
+        public IActionResult SignUpWithGoogle([FromQuery] string returnUrl, LinkGenerator linkGenerator, SignInManager<User> signInManager)
+        {
+            //var properties = signInManager.ConfigureExternalAuthenticationProperties("Google", linkGenerator.GetPathByName(_httpContextAccessor.HttpContext,
+            //    "/api/account/login/google/callback") + $"?returnUrl={returnUrl}");
+            // the EscapeDataString function is used to encode the returnUrl
+            // google does not allow the unencoded url to proecess and will throw an error
+            var callbackUrl = "/api/account/login/google/callback?returnUrl=" + Uri.EscapeDataString(returnUrl);
+            var properties = signInManager.ConfigureExternalAuthenticationProperties("Google", callbackUrl);
+
+            return Challenge(properties, ["Google"]);
+        }
+
+        [HttpGet("/api/account/login/google/callback")]
+        public async Task<IActionResult> GoogleSignUpCallback([FromQuery] string returnUrl)
+
+        {
+            var result = await _httpContextAccessor.HttpContext.AuthenticateAsync(GoogleDefaults.AuthenticationScheme);
+
+            if (!result.Succeeded)
+            {
+                return Unauthorized();
+            }
+
+            await _userRepository.LoginWithGoogle(result.Principal);
+
+            return Redirect(returnUrl);
         }
     }
 }

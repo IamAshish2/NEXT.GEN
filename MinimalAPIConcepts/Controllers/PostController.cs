@@ -68,7 +68,7 @@ namespace NEXT.GEN.Controllers
                 _logger.LogError(ex, $"Invalid operation exception occurred while getting posts for group: {groupName}");
                 return BadRequest(ex.Message);
             }
-            catch (Exception ex)
+            catch (System.Exception ex)
             {
                 _logger.LogError(ex, $"An unexpected error occurred while getting posts for group: {groupName}");
                 return StatusCode(500, "An internal server error occurred.");
@@ -110,7 +110,7 @@ namespace NEXT.GEN.Controllers
 
                 return Ok(posts);
             }
-            catch (Exception ex)
+            catch (System.Exception ex)
             {
                 return StatusCode(500, $"An error occurred: {ex.Message}");
             }
@@ -129,13 +129,14 @@ namespace NEXT.GEN.Controllers
 
                 var mappedPost = _mapper.Map<CreatePost>(newPost);
                 mappedPost.PostedDate = DateTime.UtcNow;
+                _logger.LogInformation("",mappedPost.PostedDate);
                 
                 if (!await _postRepository.CreatePost(mappedPost))
                     return StatusCode(500, "An error occurred while creating the post.");
 
                 return NoContent();
             }
-            catch (Exception ex)
+            catch (System.Exception ex)
             {
                 return StatusCode(500, $"An error occurred: {ex.Message}");
             }
@@ -155,7 +156,7 @@ namespace NEXT.GEN.Controllers
 
                 return Ok("Post updated successfully.");
             }
-            catch (Exception ex)
+            catch (System.Exception ex)
             {
                 return StatusCode(500, $"An error occurred: {ex.Message}");
             }
@@ -178,7 +179,7 @@ namespace NEXT.GEN.Controllers
 
                 return Ok("Post deleted successfully.");
             }
-            catch (Exception ex)
+            catch (System.Exception ex)
             {
                 return StatusCode(500, $"An error occurred: {ex.Message}");
             }

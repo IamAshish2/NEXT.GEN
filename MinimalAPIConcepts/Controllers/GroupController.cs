@@ -44,7 +44,7 @@ namespace NEXT.GEN.Controllers
                 return Ok(groups);
 
             }
-            catch (Exception ex)
+            catch (System.Exception ex)
             {
                 return StatusCode(500, $"An error occurred: {ex.Message}");
             }
@@ -86,7 +86,7 @@ namespace NEXT.GEN.Controllers
 
                 return Ok(group);
             }
-            catch (Exception ex)
+            catch (System.Exception ex)
             {
                 return StatusCode(500, $"An error occurred: {ex.Message}");
             }
@@ -151,7 +151,7 @@ namespace NEXT.GEN.Controllers
 
                 return CreatedAtAction(nameof(GetGroupByName), new { group.GroupName }, group);
             }
-            catch (Exception ex)
+            catch (System.Exception ex)
             {
                 return StatusCode(500, $"An error occurred: {ex.Message}");
             }
@@ -177,7 +177,7 @@ namespace NEXT.GEN.Controllers
 
                 return NoContent();
             }
-            catch (Exception ex)
+            catch (System.Exception ex)
             {
                 return StatusCode(500, $"An error occurred: {ex.Message}");
             }
@@ -199,7 +199,7 @@ namespace NEXT.GEN.Controllers
 
                 return NoContent();
             }
-            catch (Exception ex)
+            catch (System.Exception ex)
             {
                 return StatusCode(500, $"An error occurred: {ex.Message}");
             }

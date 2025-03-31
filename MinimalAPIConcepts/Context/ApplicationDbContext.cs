@@ -1,16 +1,18 @@
 ﻿
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using MinimalAPIConcepts.Models;
 using NEXT.GEN.Models;
 using NEXT.GEN.Models.PostModel;
 namespace MinimalAPIConcepts.Context
 {
-    public class ApplicationDbContext:DbContext 
+    public class ApplicationDbContext : IdentityDbContext<User>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options): base(options)
         {
             
         }
+
 
         public DbSet<User> Users { get; set; }
         public DbSet<Friendships> Friends { get; set; }
@@ -40,11 +42,11 @@ namespace MinimalAPIConcepts.Context
                 .HasForeignKey(f => f.UserName)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<Friendships>()
-                .HasOne(f => f.Friend)
-                .WithMany(f => f.FriendsFriendships)
-                .HasForeignKey(f => f.UserName)
-                .OnDelete(DeleteBehavior.Restrict);
+            //modelBuilder.Entity<Friendships>()
+            //    .HasOne(f => f.Friend)
+            //    .WithMany(f => f.FriendsFriendships)
+            //    .HasForeignKey(f => f.UserName)
+            //    .OnDelete(DeleteBehavior.Restrict);
 
             // the unique key for the groupMembers table
             modelBuilder.Entity<GroupMembers>().HasKey(f => f.GroupMemberId);
@@ -115,7 +117,7 @@ namespace MinimalAPIConcepts.Context
                .HasOne(p => p.User)
                .WithMany(u => u.Posts)
                .HasForeignKey(p => p.UserName)
-               .OnDelete(DeleteBehavior.Restrict);
+               .OnDelete(DeleteBehavior.NoAction);
         }
     }
 }
