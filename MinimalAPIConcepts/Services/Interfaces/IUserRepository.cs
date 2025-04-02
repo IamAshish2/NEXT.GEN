@@ -8,6 +8,7 @@ namespace MinimalAPIConcepts.Services.Interfaces
     {
         Task<ICollection<User>> GetUsersAsync();
         Task<User> GetUserByNameAsync(string UserName);
+        Task<User> GetUserByEmailAsync(string email);
         Task<bool> CreateUserAsync(User newUser);
         Task<bool> UpdateUserAsync(User user);
         Task<bool> DeleteUserAsync(string UserName);
@@ -15,8 +16,8 @@ namespace MinimalAPIConcepts.Services.Interfaces
         Task<bool> isUserNameInUse(string userName);
         Task<bool> checkIfUserExists(string UserName);
         Task<bool> SaveAsync();
-
-
+        // check the authentication state of the user
+        ClaimsPrincipal validateJWT(string token);
         Task<string> LoginWithGoogle(ClaimsPrincipal? claimsPrincipal);
     }
 }

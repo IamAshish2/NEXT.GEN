@@ -1,5 +1,3 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Http.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -8,7 +6,6 @@ using MinimalAPIConcepts.Models;
 using MinimalAPIConcepts.Services.Interfaces;
 using MinimalAPIConcepts.Services.Repository;
 using NEXT.GEN.Models.EmailModel;
-using NEXT.GEN.Services.HTTPONLY_MIDDLEWARE;
 using NEXT.GEN.Services.Interfaces;
 using NEXT.GEN.Services.Repository;
 using System.Net;
@@ -19,34 +16,20 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
-using Azure.Core;
 
 var builder = WebApplication.CreateBuilder(args);
-
-// Add authentication
-//builder.Services.AddAuthentication(options =>
-//{
-//    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-//    options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
-//})
-//.AddCookie()
-//.AddGoogle(googleOptions =>
-//{
-//    googleOptions.ClientId = builder.Configuration["GoogleKeys:ClientId"];
-//    googleOptions.ClientSecret = builder.Configuration["GoogleKeys:CLIENTSECRET"];
-//    googleOptions.CallbackPath = "/signin-google"; // This is the default value
-//});
 
 builder.Services.AddHttpContextAccessor();
 
 // for resolving multiple object cycles
-//builder.Services.Configure<JsonOptions>(
-//    options =>
-//    {
-//        options.SerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
-//        //options.SerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
-//    });
-
+/**
+builder.Services.Configure<JsonOptions>(
+    options =>
+    {
+        options.SerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+        //options.SerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
+    });
+*/
 // Add auto mapper configuration
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
@@ -69,56 +52,88 @@ builder.Services.AddCors( options =>
 // Add Jwt configuration
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
 
-//builder.Services.AddAuthentication(options =>
-//{
-//    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-//    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-//})
-//    .AddCookie()
-//    .AddGoogle(options =>
-//    {
-//        var clientId = builder.Configuration["Authentication:Google:ClientId"];
+/* previous configuration
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+    .AddCookie()
+    .AddGoogle(options =>
+    {
+        var clientId = builder.Configuration["Authentication:Google:ClientId"];
 
-//        // check if the clientId is null
-//        if(clientId == null)
-//        {
-//            throw new ArgumentNullException(nameof(clientId));
-//        }
+        // check if the clientId is null
+        if (clientId == null)
+        {
+            throw new ArgumentNullException(nameof(clientId));
+        }
 
-//        var clientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+        var clientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
 
-//        if(clientSecret == null)
-//        {
-//            throw new ArgumentNullException(nameof(clientSecret));  
-//        }
+        if (clientSecret == null)
+        {
+            throw new ArgumentNullException(nameof(clientSecret));
+        }
 
-//        options.ClientId = clientId;
-//        options.ClientSecret = clientSecret;
-//        options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-//    })
-//.AddJwtBearer(options =>
-//{
-//    options.TokenValidationParameters = new TokenValidationParameters
-//    {
-//        ValidateIssuer = true,
-//        ValidateAudience = true,
-//        ValidateLifetime = true,
-//        ValidateIssuerSigningKey = true,
-//        ValidIssuer = builder.Configuration["Jwt:Issuer"],
-//        ValidAudience = builder.Configuration["Jwt:Audience"],
-//        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
-//    };
-//});
+        options.ClientId = clientId;
+        options.ClientSecret = clientSecret;
+        options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    })
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+    };
+});
+*/
 
 // add service for use of IdentityUser class 
 builder.Services.AddIdentity<User, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
+
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
+
+})
+.AddJwtBearer(options =>
+{
+    // get the jwt settings from appsettings.json and map it to JwtSettings model
+    var jwtSettings = builder.Configuration.GetSection("Jwt").Get<JwtSettings>();
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidAudience = jwtSettings.Audience,
+        ValidateAudience = true,
+
+        ValidIssuer = jwtSettings.Issuer,
+        ValidateIssuer = true,
+
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Key)),
+        ValidateIssuerSigningKey = true,
+
+        ClockSkew = TimeSpan.Zero,
+    };
+
+    options.Events.OnMessageReceived = context =>
+    {
+        if(context.Request.Cookies.ContainsKey("auth_token") || context.Request.Cookies.ContainsKey("refresh_token"))
+        {
+            context.Token = context.Request.Cookies["auth_token"];
+            //context. = context.Response.Cookies["refresh_token"];
+        };
+        return Task.CompletedTask;
+    };
 })
 .AddCookie(options =>
 {
@@ -126,10 +141,11 @@ builder.Services.AddAuthentication(options =>
     options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
     options.Cookie.Name = "GoogleAuth";
     options.Cookie.HttpOnly = true;
-
     //the cookie is sent with requests from the same site and during top-level navigations to the cookie's domain
     //from a third-party site, helping to mitigate Cross-Site Request Forgery (CSRF) attacks. 
-    options.Cookie.SameSite = SameSiteMode.Lax; 
+    options.Cookie.SameSite = SameSiteMode.None;
+    options.LoginPath = "/api/auth/login";  
+    options.LogoutPath = "/api/auth/logout"; 
 })
 .AddGoogle(options =>
 {
@@ -205,7 +221,10 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
+// TODO -> TRY USING THIS MIDDLEWARE EVEN BEFORE HITTING THE CONTROLLERS 
 //app.UseMiddleware<JwtMiddleware>();
+
+
 // Map controllers
 app.MapControllers();
 

@@ -13,7 +13,7 @@ namespace MinimalAPIConcepts.Context
             
         }
 
-
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Friendships> Friends { get; set; }
         public DbSet<Group> Groups { get; set; }

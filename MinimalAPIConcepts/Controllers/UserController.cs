@@ -26,7 +26,7 @@ namespace MinimalAPIConcepts.Controllers
         [HttpGet("get-all-users")]
         [ProducesResponseType(200, Type = typeof(IEnumerable<GetUserDto>))]
         [ProducesResponseType(404)]
-        [ProducesResponseType(500,Type = typeof(ErrorResponse))]
+        [ProducesResponseType(500, Type = typeof(ErrorResponse))]
         public async Task<IActionResult> GetUsers()
         {
             try
@@ -36,19 +36,19 @@ namespace MinimalAPIConcepts.Controllers
                 {
                     return NotFound();
                 }
-                var mappedUsers = _mapper.Map<List<GetUserDto>> (users);
+                var mappedUsers = _mapper.Map<List<GetUserDto>>(users);
                 return Ok(mappedUsers);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new ErrorResponse { ErrorCode = "ERROR",Message=ex.Message});
+                return StatusCode(500, new ErrorResponse { ErrorCode = "ERROR", Message = ex.Message });
             }
         }
 
         [HttpGet("get-user-by-name/{userName}")]
-        [ProducesResponseType(200, Type = typeof(GetUserDto))] 
+        [ProducesResponseType(200, Type = typeof(GetUserDto))]
         [ProducesResponseType(404)]
-        [ProducesResponseType(500, Type = typeof(ErrorResponse))] 
+        [ProducesResponseType(500, Type = typeof(ErrorResponse))]
         public async Task<ActionResult<GetUserDto>> GetUserById(string userName)
         {
             try
@@ -57,7 +57,7 @@ namespace MinimalAPIConcepts.Controllers
 
                 if (user == null)
                 {
-                    return NotFound(new ErrorResponse { ErrorCode = "USER_NOT_FOUND", Message = "User not found." }); 
+                    return NotFound(new ErrorResponse { ErrorCode = "USER_NOT_FOUND", Message = "User not found." });
                 }
 
                 var mappedUser = _mapper.Map<GetUserDto>(user);
@@ -65,9 +65,9 @@ namespace MinimalAPIConcepts.Controllers
                 return Ok(mappedUser);
 
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
-                _logger.LogError(ex, "Error retrieving user: {userId}", userName); 
+                _logger.LogError(ex, "Error retrieving user: {userId}", userName);
                 return StatusCode(500, new ErrorResponse { ErrorCode = "INTERNAL_SERVER_ERROR", Message = "An unexpected error occurred." });
             }
         }
@@ -95,7 +95,7 @@ namespace MinimalAPIConcepts.Controllers
                 }
 
                 var hashedPassword = BCrypt.Net.BCrypt.HashPassword(user.Password);
-                _logger.LogInformation("The users hashed password is " , hashedPassword);
+                _logger.LogInformation("The users hashed password is ", hashedPassword);
                 user.Password = hashedPassword;
 
                 var mappedUser = _mapper.Map<User>(user);
@@ -122,7 +122,7 @@ namespace MinimalAPIConcepts.Controllers
         [ProducesResponseType(500)]
         public async Task<IActionResult> UpdateUser(string userName, [FromBody] UpdateUserDto updatedUser)
         {
-            if(!ModelState.IsValid)  return BadRequest(ModelState);
+            if (!ModelState.IsValid) return BadRequest(ModelState);
             if (userName == null) return BadRequest();
 
             //if (userName.Trim() != updatedUser.UserName.Trim()) return BadRequest();
@@ -157,7 +157,6 @@ namespace MinimalAPIConcepts.Controllers
         [HttpDelete("deleteUser/{userName}")]
         [ProducesResponseType(200)]
         [ProducesResponseType(500)]
-        
         public async Task<IActionResult> DeleteUser(string userName)
         {
             var findUser = await _userRepository.GetUserByNameAsync(userName);
@@ -169,11 +168,43 @@ namespace MinimalAPIConcepts.Controllers
             bool success = await _userRepository.DeleteUserAsync(userName);
             if (!success)
             {
-                ModelState.AddModelError("","An error occured while deleting the user");
-                return StatusCode(500, ModelState); 
+                ModelState.AddModelError("", "An error occured while deleting the user");
+                return StatusCode(500, ModelState);
             }
 
             return Ok("Success deletion");
         }
-    }
+
+        // only the users who have a valid accesstoken can hit this api
+        [HttpGet("get-user-profile")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(500)]
+        [ProducesResponseType(404)]
+        //[Authorize]
+        public async Task<ActionResult<GetUserDto>> GetUserProfile()
+        {
+            /* watch how to extract the data embedded in token 
+            // extract the name from the jwt token
+            //var userName = User.FindFirstValue(ClaimTypes.Name);
+            */
+
+            // we extracted the username from the cookies data successfully
+             Request.Cookies.TryGetValue("userName",out var userName);
+            if (userName == null)
+            {
+                return BadRequest("the username was not found");
+            }
+
+            var user = await _userRepository.GetUserByNameAsync(userName);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var mappedUser = _mapper.Map<GetUserDto>(user);
+
+            return Ok(mappedUser);
+        }
+
+}
 }
