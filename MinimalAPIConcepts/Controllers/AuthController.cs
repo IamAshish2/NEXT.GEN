@@ -9,9 +9,7 @@ using MinimalAPIConcepts.Context;
 using MinimalAPIConcepts.Dtos.UserDto;
 using MinimalAPIConcepts.Models;
 using MinimalAPIConcepts.Services.Interfaces;
-using NEXT.GEN.Dtos.UserDto;
 using NEXT.GEN.Exception;
-using System.Security.Claims;
 
 namespace MinimalAPIConcepts.Controllers
 {
@@ -74,25 +72,32 @@ namespace MinimalAPIConcepts.Controllers
                     return Unauthorized(new ErrorResponse { ErrorCode = "INVALID_CREDENTIALS", Message = "Invalid credentials." });
                 }
 
-                var token = _tokenGenerator.GenerateToken(loginUser.UserName, loginUser.Email);
+                var token = _tokenGenerator.GenerateToken(user);
+                var refreshToken = await _tokenGenerator.GenerateRefreshToken();
+                await _tokenGenerator.InsertRefreshToken(loginUser.UserName,refreshToken);
 
-                // Set the token in an HTTP-only cookie
-                //var cookieOptions = new CookieOptions
-                //{
-                //    HttpOnly = true,
-                //    Secure = true,
-                //    SameSite = SameSiteMode.Strict,
-                //    Expires = DateTime.UtcNow.AddMinutes(Convert.ToInt32(_jwtSettings.ExpireMinutes))
-                //};
-                //Response.Cookies.Append("auth_token", token, cookieOptions);
-
-                var response = new LoginResponseDto
+                var cookieOptions = new CookieOptions
                 {
-                    Token = token,
-                    UserName = user.UserName
-                };
 
-                return Ok(response);
+                    // Set the token in an HTTP-only cookie
+                    HttpOnly = true,
+                    IsEssential = true,
+                    // ensure communication over  https only
+                    Secure = true,
+                    // define samesitemode.none to persist the cookies on refresh and on application reload for frontend side
+                    SameSite = SameSiteMode.None,
+                    Expires = DateTime.UtcNow.AddMinutes(Convert.ToInt32(_jwtSettings.ExpireMinutes))
+                };
+                Response.Cookies.Append("auth_token", token, cookieOptions);
+                Response.Cookies.Append("userName",user.UserName,cookieOptions);
+                Response.Cookies.Append("refresh_token",refreshToken,cookieOptions);
+
+                // send other data that you want 
+                return Ok(new
+                {
+                    message = "Login successful",
+                    userName = loginUser.UserName
+                });
             }
             catch (Exception Error)
             {
@@ -101,30 +106,72 @@ namespace MinimalAPIConcepts.Controllers
             }
         }
 
-
-        [HttpGet("getUserByToken/{token}")]
+        [HttpPost("refresh")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400, Type = typeof(ErrorResponse))]
         [ProducesResponseType(401, Type = typeof(ErrorResponse))]
-        public  IActionResult getUserNameFromToken(string token)
+        public async Task<ActionResult> RequestRefreshToken()
         {
-            if (token == null) return BadRequest();
-
-            var validToken =  _tokenGenerator.ValidateToken(token);
-
-            if(validToken == null)
+            if(!Request.Cookies.TryGetValue("auth_token",out var authToken) || !Request.Cookies.TryGetValue("userName",out var userName) || !Request.Cookies.TryGetValue("refresh_token", out var refreshToken))
             {
-                return BadRequest("The token is not valid");
+                return BadRequest();
             }
 
-            var userName = validToken.Claims.FirstOrDefault(t => t.Type == ClaimTypes.Name);
+            var user = await _userRepository.GetUserByNameAsync(userName);
 
-            if(userName == null)
+            if(user == null)
             {
-                return BadRequest("The user name is null");
+                return BadRequest();
             }
 
-            return Ok(new { userName});
+            var cookieOptions = new CookieOptions
+            {
+                // Set the token in an HTTP-only cookie
+                HttpOnly = true,
+                IsEssential = true,
+                // ensure communication over  https only
+                Secure = true,
+                // define samesitemode.none to persist the cookies on refresh and on application reload for frontend side
+                SameSite = SameSiteMode.None,
+                Expires = DateTime.UtcNow.AddMinutes(Convert.ToInt32(_jwtSettings.ExpireMinutes))
+            };
+
+            var token = _tokenGenerator.GenerateToken(user);
+            var refresh = await _tokenGenerator.GenerateRefreshToken();
+            await _tokenGenerator.InsertRefreshToken(user.UserName,refresh);
+
+            Response.Cookies.Append("auth_token",token,cookieOptions);
+            Response.Cookies.Append("refresh_token",refresh,cookieOptions);
+            Response.Cookies.Append("userName",userName,cookieOptions);
+
+            return Ok();
+
+        }
+
+
+        // this method should be more concise and a way to actually check if the currently logged in 
+        // user is authenticated or not. make it more better.
+        [HttpGet("check-auth")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(500)]
+        [ProducesResponseType(404)]
+        public IActionResult CheckAuth()
+        {
+            Request.Cookies.TryGetValue("auth_token",out var accessToken);
+            if (String.IsNullOrEmpty(accessToken))
+            {
+                // the user is not authenticated
+                return Unauthorized();
+            }
+
+            var principal = _userRepository.validateJWT(accessToken);
+            if(principal == null)
+            {
+                return Unauthorized();
+            }
+
+            // ok response means that the token is verified and is okay
+            return Ok();
         }
 
 

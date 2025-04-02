@@ -1,10 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using MinimalAPIConcepts.Context;
 using MinimalAPIConcepts.Models;
 using MinimalAPIConcepts.Services.Interfaces;
-using NEXT.GEN.Exception;
 using NEXT.GEN.Exceptions;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Text;
 
 namespace MinimalAPIConcepts.Services.Repository
 {
@@ -12,11 +14,13 @@ namespace MinimalAPIConcepts.Services.Repository
     {
         private readonly ApplicationDbContext _context;
         private readonly ITokenGenerator _tokenGenerator;
+        private readonly JwtSettings _jwtSettings;
 
-        public UserRepository(ApplicationDbContext context,ITokenGenerator tokenGenerator)
+        public UserRepository(ApplicationDbContext context,ITokenGenerator tokenGenerator,JwtSettings jwtSettings)
         {
             _context = context;
             _tokenGenerator = tokenGenerator;
+            _jwtSettings = jwtSettings;
         }
 
         public async Task<bool> CreateUserAsync(User newUser)
@@ -39,6 +43,11 @@ namespace MinimalAPIConcepts.Services.Repository
         public async Task<User> GetUserByNameAsync(string UserName)
         {
             return await _context.Users.FirstOrDefaultAsync(u => u.UserName == UserName);
+        }
+
+        public async Task<User> GetUserByEmailAsync(string email)
+        {
+            return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
         }
 
         public async Task<ICollection<User>> GetUsersAsync()
@@ -89,9 +98,9 @@ namespace MinimalAPIConcepts.Services.Repository
             }
 
 
-            var user = await isEmailInUse(email);
+            var user = await GetUserByEmailAsync(email);
 
-            if (!user)
+            if (user == null)
             {
                 var newUser = new User
                 {
@@ -110,8 +119,40 @@ namespace MinimalAPIConcepts.Services.Repository
 
             var userName = claimsPrincipal.FindFirstValue(ClaimTypes.Name);
 
-            var jwtToken = _tokenGenerator.GenerateToken(userName,email);
+            var jwtToken = _tokenGenerator.GenerateToken(user);
             return jwtToken;
+        }
+
+        public ClaimsPrincipal validateJWT(string token)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+
+            // get the key that was used to create the token
+            var securityKey = Encoding.UTF8.GetBytes(_jwtSettings.Key);
+
+            var tokenValidationParameter = new TokenValidationParameters
+            {
+                ValidateAudience = true,
+                ValidAudience = _jwtSettings.Audience,
+
+                ValidateIssuer = true,
+                ValidIssuer = _jwtSettings.Issuer,
+
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(securityKey),
+
+                ValidateLifetime = true,
+                ClockSkew = TimeSpan.Zero
+            };
+
+            var principal = tokenHandler.ValidateToken(token,tokenValidationParameter,out var validatedToken);
+
+            if(validatedToken is JwtSecurityToken)
+            {
+                return principal;
+            }
+
+            return null;
         }
     }
 }
