@@ -50,7 +50,7 @@ namespace NEXT.GEN.Services.Repository
                     Category = g.Category,
                     Description = g.Description,
                     MemberCount = g.MemberCount,
-                    CreatorName = g.CreatorName,
+                    CreatorId = g.CreatorId,
                 })
                 .ToListAsync();
         }
@@ -97,12 +97,12 @@ namespace NEXT.GEN.Services.Repository
                     Category = g.Category,
                     Description = g.Description,
                     MemberCount = g.MemberCount,
-                    CreatorName = g.CreatorName,
+                    CreatorId = g.CreatorId,
                 })
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<GetGroupDetailsDto> GetGroupDetailsByName(string groupName, string memberName)
+        public async Task<GetGroupDetailsDto> GetGroupDetailsByName(string groupName, string memberId)
         {
             return await _context.Groups.Where(g => g.GroupName == groupName)
                 .Select(g => new GetGroupDetailsDto
@@ -112,8 +112,8 @@ namespace NEXT.GEN.Services.Repository
                     Category = g.Category,
                     Description = g.Description,
                     MemberCount = g.MemberCount,
-                    CreatorName = g.CreatorName,
-                    HasJoined = g.Members.Any(g => g.UserName == memberName && g.GroupName == groupName && g.HasJoined),
+                    CreatorId = g.CreatorId,
+                    HasJoined = g.Members.Any(g => g.MemberId == memberId && g.GroupName == groupName && g.HasJoined),
                     
                 }).FirstOrDefaultAsync();
         }

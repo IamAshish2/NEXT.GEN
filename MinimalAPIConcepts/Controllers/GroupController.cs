@@ -20,12 +20,14 @@ namespace NEXT.GEN.Controllers
         private readonly IGroupRepository _groupRepository;
         private readonly IGroupMemberRepository _groupMemberRepository;
         private readonly IMapper _mapper;
+        private readonly ILogger<GroupMembers> _logger;
 
-        public GroupsController(IGroupRepository groupRepository,IGroupMemberRepository groupMemberRepository, IMapper mapper)
+        public GroupsController(IGroupRepository groupRepository,IGroupMemberRepository groupMemberRepository, IMapper mapper, ILogger<GroupMembers> logger )
         {
             _groupRepository = groupRepository;
             _groupMemberRepository = groupMemberRepository;
             _mapper = mapper;
+            _logger = logger;
         }
 
         // GET: api/groups
@@ -78,7 +80,13 @@ namespace NEXT.GEN.Controllers
         {
             try
             {
-                var group = await _groupRepository.GetGroupDetailsByName(query.GroupName,query.UserName);
+                Request.Cookies.TryGetValue("userId", out var userId);
+                if (String.IsNullOrEmpty(userId))
+                {
+                    return BadRequest();
+                }
+
+                var group = await _groupRepository.GetGroupDetailsByName(query.GroupName, userId);
 
 
                 if (group == null)
@@ -115,8 +123,17 @@ namespace NEXT.GEN.Controllers
                 //    //Members = new List<GroupMembers> { new GroupMembers { UserId = createGroupDto.CreatorId} }
                 //};
 
+
+                Request.Cookies.TryGetValue("userId", out var userId);
+                if (String.IsNullOrEmpty(userId))
+                {
+                    return BadRequest();
+                }
+
+
                 var group = _mapper.Map<Group>(createGroupDto);
 
+                group.CreatorId = userId;
                 group.MemberCount++;
 
                 var created = await _groupRepository.CreateGroup(group);
@@ -131,7 +148,7 @@ namespace NEXT.GEN.Controllers
                 //group.Members = new List<GroupMembers> { new GroupMembers { UserName = createGroupDto.CreatorName, GroupName = createGroupDto.GroupName } };
 
                 var newMember = _mapper.Map<GroupMembers>(group);
-                newMember.UserName = group.CreatorName;
+                newMember.MemberId  = userId;
 
                 if (!await _groupMemberRepository.JoinGroup(newMember))
                 {
@@ -139,7 +156,7 @@ namespace NEXT.GEN.Controllers
                     return BadRequest(ModelState);
                 }
 
-                if (!await _groupMemberRepository.MakeUserAMember(group.GroupName, group.CreatorName))
+                if (!await _groupMemberRepository.MakeUserAMember(group.GroupName, userId))
                 {
                     ModelState.AddModelError("error", "The user add process failed.");
                     await _groupMemberRepository.RemoveMember(newMember);
@@ -208,6 +225,14 @@ namespace NEXT.GEN.Controllers
         [HttpPost("upload-post-to-group")]
         public async Task<IActionResult> UploadPostToGroup([FromBody] UploadPostToGroup request)
         {
+
+            Request.Cookies.TryGetValue("userId", out var userId);
+            if (String.IsNullOrEmpty(userId))
+            {
+                return BadRequest();
+            }
+
+
             if (!ModelState.IsValid)
             {
                 return BadRequest();
@@ -217,16 +242,17 @@ namespace NEXT.GEN.Controllers
                 return NotFound();
             }
 
-            if(!await _groupMemberRepository.DoesUserExists(request.UserName)){
+            if(!await _groupMemberRepository.DoesUserExists(userId)){
                 return NotFound();
             }
 
-            if(!await _groupMemberRepository.IsUserAlreadyAMember(request.UserName, request.GroupName))
+            if(!await _groupMemberRepository.IsUserAlreadyAMember(userId, request.GroupName))
             {
                 return BadRequest("The user is not a part of the group.");
             }
 
             var mappedRequest = _mapper.Map<CreatePost>(request);
+            mappedRequest.CreatorId = userId;
 
             if(!await _groupRepository.CreatePost(mappedRequest))
             {

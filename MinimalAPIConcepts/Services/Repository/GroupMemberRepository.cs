@@ -88,15 +88,15 @@ namespace NEXT.GEN.Services.Repository
             return group != null;
         }
 
-        public async Task<bool> IsUserAlreadyAMember(string userName,string groupName)
+        public async Task<bool> IsUserAlreadyAMember(string userId,string groupName)
         {
-            var userExists = await _context.GroupMembers.FirstOrDefaultAsync(g => g.UserName == userName && g.GroupName == groupName);
+            var userExists = await _context.GroupMembers.FirstOrDefaultAsync(g => g.MemberId == userId && g.GroupName == groupName);
             return userExists != null;
         }
 
-        public async Task<bool> MakeUserAMember(string groupName,string userName)
+        public async Task<bool> MakeUserAMember(string groupName,string userId)
         {
-            var user = await _context.GroupMembers.FirstOrDefaultAsync(g => g.UserName == userName && g.GroupName == groupName);
+            var user = await _context.GroupMembers.FirstOrDefaultAsync(g => g.MemberId == userId && g.GroupName == groupName);
 
             if(user != null)
             {
@@ -106,9 +106,9 @@ namespace NEXT.GEN.Services.Repository
             return await Save();
         }
 
-        public async Task<bool> DoesUserExists(string userName)
+        public async Task<bool> DoesUserExists(string userId)
         {
-            return await _context.Users.AnyAsync(u => u.UserName == userName);
+            return await _context.Users.AnyAsync(u => u.Id == userId);
         }
     }
 

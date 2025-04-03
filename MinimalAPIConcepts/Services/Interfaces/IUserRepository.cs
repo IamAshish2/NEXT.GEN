@@ -7,7 +7,8 @@ namespace MinimalAPIConcepts.Services.Interfaces
     public interface IUserRepository
     {
         Task<ICollection<User>> GetUsersAsync();
-        Task<User> GetUserByNameAsync(string UserName);
+        Task<GetUserDto> GetUserByIdAsync(string userId);
+        Task<User> GetUserByNameAsync(string userName);
         Task<User> GetUserByEmailAsync(string email);
         Task<bool> CreateUserAsync(User newUser);
         Task<bool> UpdateUserAsync(User user);

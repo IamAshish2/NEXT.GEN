@@ -36,14 +36,14 @@ namespace NEXT.GEN.Controllers
                     return BadRequest(ModelState);
                 }
 
-                var checkFriendshipExists = await _friendshipsRepository.CheckIfFriendshipAlreadyExists(addNewFriend.RequestorUserName,addNewFriend.RequestedUserName);
+                var checkFriendshipExists = await _friendshipsRepository.CheckIfFriendshipAlreadyExists(addNewFriend.RequestorUserId,addNewFriend.RequestedUserId);
                 if (checkFriendshipExists)
                 {
                     return BadRequest("The friendship already exists.");
                 }
 
-                var getRequestor = await _userRepository.GetUserByNameAsync(addNewFriend.RequestorUserName);
-                var getRequested = await _userRepository.GetUserByNameAsync(addNewFriend.RequestedUserName);
+                var getRequestor = await _userRepository.GetUserByNameAsync(addNewFriend.RequestorUserId);
+                var getRequested = await _userRepository.GetUserByNameAsync(addNewFriend.RequestedUserId);
 
                 if(getRequestor == null || getRequested == null)
                 {
@@ -69,18 +69,18 @@ namespace NEXT.GEN.Controllers
         }
 
 
-        [HttpGet("get-users-friends/{userName}")]
-        public async Task<ActionResult<ICollection<GetUsersFriendshipsDto>>> GetUsersFriends(string userName )
+        [HttpGet("get-users-friends/{userId}")]
+        public async Task<ActionResult<ICollection<GetUsersFriendshipsDto>>> GetUsersFriends(string userId )
         {
             try
             {
-                var userExists = await _userRepository.checkIfUserExists(userName);
+                var userExists = await _userRepository.checkIfUserExists(userId);
                 if (!userExists)
                 {
                     return BadRequest();
                 }
 
-                var friendships = await _friendshipsRepository.GetUsersFriends(userName);
+                var friendships = await _friendshipsRepository.GetUsersFriends(userId);
                 if(friendships == null)
                 {
                     return Ok();

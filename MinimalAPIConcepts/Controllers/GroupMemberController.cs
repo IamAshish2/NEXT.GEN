@@ -71,7 +71,14 @@ namespace NEXT.GEN.Controllers
         {
             if (!ModelState.IsValid) return BadRequest("The request was incomplete");
 
-            var userExists = await _groupMemberRepository.DoesUserExists(request.userName);
+
+            Request.Cookies.TryGetValue("userId", out var userId);
+            if (String.IsNullOrEmpty(userId))
+            {
+                return BadRequest();
+            }
+
+            var userExists = await _groupMemberRepository.DoesUserExists(userId);
             if (!userExists)
             {
                 return BadRequest();
@@ -83,12 +90,13 @@ namespace NEXT.GEN.Controllers
                 return BadRequest("The group does not exist.");
 
             // check if the user is already a memeber
-            var isAMember = await _groupMemberRepository.IsUserAlreadyAMember(request.userName,request.GroupName);
+            var isAMember = await _groupMemberRepository.IsUserAlreadyAMember(userId,request.GroupName);
             if (isAMember)
                 return BadRequest("The user is already a part of the group.");
 
             // send a join request to the group for the given user
             var mappedRequest = _mapper.Map<GroupMembers>(request);
+            mappedRequest.MemberId = userId;
             mappedRequest.JoinDate = DateTime.Now;
             
 
@@ -98,7 +106,7 @@ namespace NEXT.GEN.Controllers
                 return BadRequest(ModelState);
             }
 
-            if(!await _groupMemberRepository.MakeUserAMember(request.GroupName, request.userName))
+            if(!await _groupMemberRepository.MakeUserAMember(request.GroupName, userId))
             {
                 ModelState.AddModelError("error", "The user add process failed.");
                await  _groupMemberRepository.RemoveMember(mappedRequest);

@@ -37,6 +37,13 @@ namespace NEXT.GEN.Controllers
                 return BadRequest("The model state was invalid.");
             }
 
+            Request.Cookies.TryGetValue("userId",out var userId);
+
+            if (String.IsNullOrEmpty(userId))
+            {
+                return BadRequest();
+            }
+
             if(!await _postRepository.DoesPostExist(request.PostId))
             {
                 return NotFound("The post does not exist.");
@@ -47,7 +54,7 @@ namespace NEXT.GEN.Controllers
                 return NotFound("The group does not exist.");
             }
 
-            if(! await _userRepository.checkIfUserExists(request.UserName))
+            if(! await _userRepository.checkIfUserExists(userId))
             {
                 return NotFound("The userName does not exist.");
             }
@@ -61,6 +68,7 @@ namespace NEXT.GEN.Controllers
             }
 
             var mappedRequest = _mapper.Map<Likes>(request);
+            mappedRequest.UserId = userId;
             mappedRequest.LikedDate = DateTime.UtcNow;
 
 

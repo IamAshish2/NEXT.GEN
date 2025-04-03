@@ -22,12 +22,12 @@ namespace NEXT.GEN.Services.Repository
 
         public async Task<Likes> FindLike(AddLikeDto request)
         {
-            return await _context.Likes.FirstOrDefaultAsync(l => l.PostId == request.PostId && request.UserName == l.UserName && request.GroupName == l.GroupName);
+            return await _context.Likes.FirstOrDefaultAsync(l => l.PostId == request.PostId && request.userId == l.UserId && request.GroupName == l.GroupName);
         }
 
         public async Task<bool> CheckIfLiked(AddLikeDto request)
         {
-            return await _context.Likes.AnyAsync(l => l.PostId == request.PostId && request.UserName == l.UserName && request.GroupName == l.GroupName);
+            return await _context.Likes.AnyAsync(l => l.PostId == request.PostId && request.userId == l.UserId && request.GroupName == l.GroupName);
         }
 
         public async Task<bool> RemoveLikeToPost(Likes oldLike)

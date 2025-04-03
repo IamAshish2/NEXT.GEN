@@ -45,15 +45,20 @@ namespace MinimalAPIConcepts.Controllers
             }
         }
 
-        [HttpGet("get-user-by-name/{userName}")]
+        [HttpGet("get-user-by-name/")]
         [ProducesResponseType(200, Type = typeof(GetUserDto))]
         [ProducesResponseType(404)]
         [ProducesResponseType(500, Type = typeof(ErrorResponse))]
-        public async Task<ActionResult<GetUserDto>> GetUserById(string userName)
+        public async Task<ActionResult<GetUserDto>> GetUserById()
         {
             try
             {
-                var user = await _userRepository.GetUserByNameAsync(userName);
+                Request.Cookies.TryGetValue("userId",out var userId);
+                if (String.IsNullOrEmpty(userId))
+                {
+                    return BadRequest(new ErrorResponse{ Message="The username was not found.",ErrorCode="404" });
+                }
+                var user = await _userRepository.GetUserByIdAsync(userId);
 
                 if (user == null)
                 {
@@ -67,7 +72,7 @@ namespace MinimalAPIConcepts.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error retrieving user: {userId}", userName);
+                _logger.LogError(ex, "Error retrieving user");
                 return StatusCode(500, new ErrorResponse { ErrorCode = "INTERNAL_SERVER_ERROR", Message = "An unexpected error occurred." });
             }
         }
@@ -116,19 +121,26 @@ namespace MinimalAPIConcepts.Controllers
             }
         }
 
-        [HttpPut("update-user/{userName}")]
+        [HttpPut("update-user/")]
         [ProducesResponseType(201)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
-        public async Task<IActionResult> UpdateUser(string userName, [FromBody] UpdateUserDto updatedUser)
+        public async Task<IActionResult> UpdateUser([FromBody] UpdateUserDto updatedUser)
         {
+            Request.Cookies.TryGetValue("userId",out var userId);
+            Request.Cookies.TryGetValue("userName",out var userName);
+            if (String.IsNullOrEmpty(userId) || String.IsNullOrEmpty(userName))
+            {
+                return BadRequest();
+            }
+
             if (!ModelState.IsValid) return BadRequest(ModelState);
-            if (userName == null) return BadRequest();
+            if (userId == null) return BadRequest();
 
             //if (userName.Trim() != updatedUser.UserName.Trim()) return BadRequest();
 
             //var userExists = await _userRepository.checkIfUserExists(Id);
-            var userExists = await _userRepository.checkIfUserExists(userName);
+            var userExists = await _userRepository.checkIfUserExists(userId);
             if (!userExists)
             {
                 return NotFound();
@@ -136,16 +148,19 @@ namespace MinimalAPIConcepts.Controllers
 
             var existingUser = await _userRepository.GetUserByNameAsync(userName);
 
-            //existingUser.UserName = updatedUser.UserName;
-            //existingUser.Email = updatedUser.Email;
+            if(existingUser == null)
+            {
+                return NotFound();
+            }
 
-            // Map only non-null properties from updatedUser to existingUser
+            // Map UpdateUserDto to GetUserDto while ignoring null values
+            //var mappedDto = _mapper.Map(updatedUser, existingUser);
+
+            // Map GetUserDto to User entity while ignoring null values
             _mapper.Map(updatedUser, existingUser);
 
 
-            var mappedUser = _mapper.Map<User>(existingUser);
-
-            bool success = await _userRepository.UpdateUserAsync(mappedUser);
+            bool success = await _userRepository.UpdateUserAsync(existingUser);
             if (!success)
             {
                 ModelState.AddModelError("", "Unsuccessful operation. Try again!");
@@ -189,13 +204,13 @@ namespace MinimalAPIConcepts.Controllers
             */
 
             // we extracted the username from the cookies data successfully
-             Request.Cookies.TryGetValue("userName",out var userName);
-            if (userName == null)
+             Request.Cookies.TryGetValue("userId",out var userId);
+            if (userId == null)
             {
                 return BadRequest("the username was not found");
             }
 
-            var user = await _userRepository.GetUserByNameAsync(userName);
+            var user = await _userRepository.GetUserByNameAsync(userId);
             if (user == null)
             {
                 return NotFound();

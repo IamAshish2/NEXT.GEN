@@ -1,8 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using MinimalAPIConcepts.Context;
 using MinimalAPIConcepts.Models;
 using MinimalAPIConcepts.Services.Interfaces;
+using NEXT.GEN.Dtos.UserDto;
 using NEXT.GEN.Exceptions;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -14,13 +17,15 @@ namespace MinimalAPIConcepts.Services.Repository
     {
         private readonly ApplicationDbContext _context;
         private readonly ITokenGenerator _tokenGenerator;
+        private readonly IMapper _mapper;
         private readonly JwtSettings _jwtSettings;
 
-        public UserRepository(ApplicationDbContext context,ITokenGenerator tokenGenerator,JwtSettings jwtSettings)
+        public UserRepository(ApplicationDbContext context,ITokenGenerator tokenGenerator,IOptions<JwtSettings> jwtSettings,IMapper mapper)
         {
             _context = context;
             _tokenGenerator = tokenGenerator;
-            _jwtSettings = jwtSettings;
+            _mapper = mapper;
+            _jwtSettings = jwtSettings.Value;
         }
 
         public async Task<bool> CreateUserAsync(User newUser)
@@ -40,9 +45,28 @@ namespace MinimalAPIConcepts.Services.Repository
             return await SaveAsync();
         }
 
-        public async Task<User> GetUserByNameAsync(string UserName)
+        public async Task<GetUserDto> GetUserByIdAsync(string userId)
         {
-            return await _context.Users.FirstOrDefaultAsync(u => u.UserName == UserName);
+            return await _context.Users.Where(u => u.Id == userId)
+                .Select(u => new GetUserDto
+                {
+                    Id = u.Id,
+                    FullName = u.FullName,
+                    UserName = u.UserName,
+                    Email = u.Email,
+                    Bio = u.Bio,
+                    Course = u.Course,
+                    Address = u.Address,
+                    Socials = u.Socials,
+                    Skills = u.Skills,
+                    Stats = new UserStatsResponseDto
+                    {
+                        Posts = u.Posts.Count(u => u.CreatorId == userId),
+                        Groups = u.GroupMember.Count(u => u.MemberId == userId),
+                        Connections = u.UserFriendships.Count(u => u.UserId == userId)
+                    }
+                }).FirstOrDefaultAsync();
+                ;
         }
 
         public async Task<User> GetUserByEmailAsync(string email)
@@ -62,7 +86,7 @@ namespace MinimalAPIConcepts.Services.Repository
 
         public async Task<bool> UpdateUserAsync(User user)
         {
-            _context.Update(user);
+            _context.Users.Update(user);
             return await SaveAsync();
         }
 
@@ -77,9 +101,9 @@ namespace MinimalAPIConcepts.Services.Repository
             var user = await _context.Users.FirstOrDefaultAsync(u => u.UserName == userName);
             return user == null ? false : true;
         }
-        public async Task<bool> checkIfUserExists(string UserName)
+        public async Task<bool> checkIfUserExists(string userId)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.UserName == UserName);
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
             return user == null ? false : true;
         }
 
@@ -119,7 +143,9 @@ namespace MinimalAPIConcepts.Services.Repository
 
             var userName = claimsPrincipal.FindFirstValue(ClaimTypes.Name);
 
-            var jwtToken = _tokenGenerator.GenerateToken(user);
+            var mappedUser = _mapper.Map<User>(user);
+
+            var jwtToken = _tokenGenerator.GenerateToken(mappedUser);
             return jwtToken;
         }
 
@@ -153,6 +179,11 @@ namespace MinimalAPIConcepts.Services.Repository
             }
 
             return null;
+        }
+
+        public async Task<User> GetUserByNameAsync(string userName)
+        {
+            return await _context.Users.FirstOrDefaultAsync(u => u.UserName == userName);
         }
     }
 }
