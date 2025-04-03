@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -19,14 +20,16 @@ namespace MinimalAPIConcepts.Controllers
     {
         
         private readonly ApplicationDbContext _context;
+        private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ITokenGenerator _tokenGenerator;
         private readonly IUserRepository _userRepository;
         private readonly JwtSettings _jwtSettings;
 
-        public AuthController(ApplicationDbContext context, IHttpContextAccessor  httpContextAccessor ,ITokenGenerator tokenGenerator, IOptions<JwtSettings> jwtSettings, IUserRepository userRepository)
+        public AuthController(ApplicationDbContext context, IMapper mapper ,IHttpContextAccessor  httpContextAccessor ,ITokenGenerator tokenGenerator, IOptions<JwtSettings> jwtSettings, IUserRepository userRepository)
         {
             _context = context;
+            _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
             _tokenGenerator = tokenGenerator;
             _userRepository = userRepository;
@@ -34,7 +37,7 @@ namespace MinimalAPIConcepts.Controllers
         }
 
         [HttpGet]
-        [Authorize]
+        //[Authorize]
         // This endpoint can only be hit by the authorized user i.e. admin in this case. 
         // so, if the endpoint returns 200 ok , the user is authorized
         // else the user is not authorized.
@@ -62,7 +65,7 @@ namespace MinimalAPIConcepts.Controllers
 
                 if (user == null)
                 {
-                    return Unauthorized(new ErrorResponse { ErrorCode = "USER_NOT_FOUND", Message = "User not found." });
+                    return Unauthorized(new ErrorResponse { ErrorCode = "USER_NOT_FOUND", Message = "The username or email does not exist." });
                 }
 
                 var checkPassword = BCrypt.Net.BCrypt.Verify(loginUser.Password, user.Password);
@@ -90,6 +93,7 @@ namespace MinimalAPIConcepts.Controllers
                 };
                 Response.Cookies.Append("auth_token", token, cookieOptions);
                 Response.Cookies.Append("userName",user.UserName,cookieOptions);
+                Response.Cookies.Append("userId", user.Id,cookieOptions);
                 Response.Cookies.Append("refresh_token",refreshToken,cookieOptions);
 
                 // send other data that you want 
@@ -142,6 +146,7 @@ namespace MinimalAPIConcepts.Controllers
 
             Response.Cookies.Append("auth_token",token,cookieOptions);
             Response.Cookies.Append("refresh_token",refresh,cookieOptions);
+            Response.Cookies.Append("userId", user.Id, cookieOptions);
             Response.Cookies.Append("userName",userName,cookieOptions);
 
             return Ok();
@@ -170,8 +175,16 @@ namespace MinimalAPIConcepts.Controllers
                 return Unauthorized();
             }
 
+            Request.Cookies.TryGetValue("userId",out var userId);
+            Request.Cookies.TryGetValue("refresh_token",out var refreshToken);
+
+            if(String.IsNullOrEmpty(userId) || String.IsNullOrEmpty(refreshToken))
+            {
+                return Unauthorized(new ErrorResponse { ErrorCode = "401", Message = "You have been logged out. Please login again."});
+            }
+
             // ok response means that the token is verified and is okay
-            return Ok();
+            return Ok(new {isLogggedIn = true});
         }
 
 

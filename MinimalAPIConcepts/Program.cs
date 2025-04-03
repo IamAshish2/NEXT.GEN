@@ -217,9 +217,9 @@ builder.Services.AddScoped<ICommentRepository,CommentRepository>();
 var app = builder.Build();
 
 app.UseCors("AllowAllOrigins");
-app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseHttpsRedirection();
 
 // TODO -> TRY USING THIS MIDDLEWARE EVEN BEFORE HITTING THE CONTROLLERS 
 //app.UseMiddleware<JwtMiddleware>();

@@ -24,9 +24,17 @@ namespace NEXT.GEN.Controllers
         [ProducesResponseType(500)]
         public async Task<IActionResult> CreateComment([FromBody] CreateCommentDto comment)
         {
+
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
+            }
+
+            Request.Cookies.TryGetValue("userId", out var userId);
+
+            if (String.IsNullOrEmpty(userId))
+            {
+                return BadRequest();
             }
 
             if (!await _postRepository.DoesPostExist(comment.PostId))
@@ -34,12 +42,13 @@ namespace NEXT.GEN.Controllers
                 return NotFound("The post does not exist.");
             }
 
-            if (!await _userRepository.checkIfUserExists(comment.UserName))
+            if (!await _userRepository.checkIfUserExists(userId))
             {
                 return NotFound("The userName does not exist.");
             }
 
             var mappedComment = _mapper.Map<Comment>(comment);
+            mappedComment.UserId = userId;
             mappedComment.CommentDate = DateTime.Now;
             if (!await _commentRepository.CreateComment(mappedComment))
             {

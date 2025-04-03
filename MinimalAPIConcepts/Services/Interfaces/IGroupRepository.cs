@@ -13,7 +13,7 @@ namespace NEXT.GEN.Services.Interfaces
         Task<GetGroupDetailsDto> GetGroupByName(string groupName);
 
         //  This endpoint returns gropDetails with hasJoined value for members
-        Task<GetGroupDetailsDto> GetGroupDetailsByName(string groupName,string memberName);
+        Task<GetGroupDetailsDto> GetGroupDetailsByName(string groupName,string memberId);
         Task<bool> DoesGroupExist(string groupName);
         Task<bool> DeleteGroup(string groupName);
 

@@ -52,7 +52,7 @@ namespace NEXT.GEN.Services.Repository
                 {
                     CommentId = c.CommentId,
                     Content = c.Content,
-                    UserName = c.UserName,
+                    userId = c.User.Id,
                     CommentDate = c.CommentDate
                 })
                 .ToListAsync();

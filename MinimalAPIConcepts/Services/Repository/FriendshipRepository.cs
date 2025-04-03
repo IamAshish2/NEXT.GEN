@@ -22,10 +22,10 @@ namespace NEXT.GEN.Services.Repository
             return await Save();
         }
 
-        public async Task<bool> CheckIfFriendshipAlreadyExists(string requestorUserName, string requestedUserName)
+        public async Task<bool> CheckIfFriendshipAlreadyExists(string  requestorUserId, string  requestedUserId)
         {
 
-            var checkFriendship = await _context.Friends.Where(f => f.UserName == requestedUserName && f.AnotherUserName == requestedUserName).FirstOrDefaultAsync();
+            var checkFriendship = await _context.Friends.Where(f => f.UserId == requestedUserId && f.FriendId == requestedUserId).FirstOrDefaultAsync();
             if(checkFriendship != null)
             {
                 return  true;
@@ -34,9 +34,9 @@ namespace NEXT.GEN.Services.Repository
             return false;
         }
 
-        public async Task<Friendships> GetFriendship(string requestorUserName, string requestedUserName)
+        public async Task<Friendships> GetFriendship(string requestedUserId, string requestorUserId)
         {
-            return await _context.Friends.Where(f => f.UserName == requestedUserName && f.UserName == requestedUserName).FirstOrDefaultAsync();
+            return await _context.Friends.Where(f => f.UserId == requestedUserId && f.FriendId == requestorUserId).FirstOrDefaultAsync();
         }
 
         // what am i gonna do with get all friendships?
@@ -45,11 +45,11 @@ namespace NEXT.GEN.Services.Repository
             return  await _context.Friends.OrderBy(f => f.FriendshipId).ToListAsync();
         }
 
-        public async Task<ActionResult<ICollection<GetUsersFriendshipsDto>>> GetUsersFriends(string userName)
+        public async Task<ActionResult<ICollection<GetUsersFriendshipsDto>>> GetUsersFriends(string userId)
         {
             var friends = await _context.Friends
-                .Where(f => f.UserName == userName)
-                .OrderBy(f => f.UserName)
+                .Where(f => f.UserId == userId)
+                .OrderBy(f => f.UserId)
                 .Include(f => f.Friend)
                 .Select(f => new GetUsersFriendshipsDto
                 {

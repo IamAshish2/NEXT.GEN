@@ -39,7 +39,7 @@ namespace MinimalAPIConcepts.Context
             modelBuilder.Entity<Friendships>()
                 .HasOne(f => f.User)
                 .WithMany(f => f.UserFriendships)
-                .HasForeignKey(f => f.UserName)
+                .HasForeignKey(f => f.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             //modelBuilder.Entity<Friendships>()
@@ -63,12 +63,12 @@ namespace MinimalAPIConcepts.Context
             modelBuilder.Entity<GroupMembers>()
                 .HasOne(g => g.User)
                 .WithMany(g => g.GroupMember)
-                .HasForeignKey(g => g.UserName)
+                .HasForeignKey(g => g.MemberId)
                 .OnDelete(DeleteBehavior.NoAction);
                 //.OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<GroupMembers>()
-              .HasIndex(u => new { u.UserName, u.GroupName }).IsUnique();
+              .HasIndex(u => new { u.GroupMemberId, u.GroupName }).IsUnique();
 
             // 
             modelBuilder.Entity<Comment>().HasKey(c => c.CommentId);
@@ -76,7 +76,7 @@ namespace MinimalAPIConcepts.Context
             modelBuilder.Entity<Comment>()
                 .HasOne(c => c.User)
                 .WithMany(c => c.Comments)
-                .HasForeignKey(c => c.UserName)
+                .HasForeignKey(c => c.UserId)
                 .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<Comment>()
@@ -90,7 +90,7 @@ namespace MinimalAPIConcepts.Context
             modelBuilder.Entity<Likes>()
                .HasOne(c => c.User)
                .WithMany(c => c.Likes)
-               .HasForeignKey(c => c.UserName)
+               .HasForeignKey(c => c.UserId)
                .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<Likes>()
@@ -116,7 +116,7 @@ namespace MinimalAPIConcepts.Context
             modelBuilder.Entity<CreatePost>()
                .HasOne(p => p.User)
                .WithMany(u => u.Posts)
-               .HasForeignKey(p => p.UserName)
+               .HasForeignKey(p => p.CreatorId)
                .OnDelete(DeleteBehavior.NoAction);
         }
     }

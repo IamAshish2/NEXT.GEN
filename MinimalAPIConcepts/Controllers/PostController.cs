@@ -37,6 +37,12 @@ namespace NEXT.GEN.Controllers
         [HttpGet("get-all-group-posts/{groupName}")]
         public async Task<ActionResult<ICollection<GetGroupPostsDto>>> GetAllPosts(string groupName)
         {
+            Request.Cookies.TryGetValue("userId", out var userId);
+            if (userId == null)
+            {
+                return BadRequest("the username was not found");
+            }
+
             if (string.IsNullOrWhiteSpace(groupName))
             {
                 return BadRequest("Group name is required.");
@@ -48,7 +54,7 @@ namespace NEXT.GEN.Controllers
 
             try
             {
-                var posts = await _postRepository.GetAllPostsFromGroup(groupName);
+                var posts = await _postRepository.GetAllPostsFromGroup(groupName,userId);
 
                 // if there are no posts in the group then, return an empty list
                 if (posts == null || posts.Count == 0)
