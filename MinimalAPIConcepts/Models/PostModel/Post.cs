@@ -17,8 +17,8 @@ namespace NEXT.GEN.Models.PostModel
         public List<string> ImageUrls { get; set; } = new List<string>();
 
         // one user can make many posts.
-        public string UserName { get; set; }
-        [ForeignKey("UserName")]
+        public string CreatorId { get; set; }
+        [ForeignKey("CreatorId")]
         public User User { get; set; }
 
         // one group can have many posts

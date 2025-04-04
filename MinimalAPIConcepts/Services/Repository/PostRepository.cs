@@ -90,6 +90,7 @@ namespace NEXT.GEN.Services.Repository
                         CommentId = c.CommentId,
                         Content = c.Content,
                         userId = c.UserId,
+                        userName = c.User.UserName,
                         CommentDate = c.CommentDate
                     }).ToList()
                 }).FirstOrDefaultAsync();

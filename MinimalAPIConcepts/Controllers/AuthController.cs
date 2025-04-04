@@ -72,7 +72,7 @@ namespace MinimalAPIConcepts.Controllers
 
                 if (!checkPassword)
                 {
-                    return Unauthorized(new ErrorResponse { ErrorCode = "INVALID_CREDENTIALS", Message = "Invalid credentials." });
+                    return Unauthorized(new ErrorResponse { ErrorCode = "INVALID_CREDENTIALS", Message = "Enter the correct details to login." });
                 }
 
                 var token = _tokenGenerator.GenerateToken(user);
