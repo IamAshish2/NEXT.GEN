@@ -18,8 +18,11 @@ namespace NEXT.GEN.Models
         public string GroupImage { get; set; }
         // for checking if the user has joined the  given group
         //public bool HasJoined { get; set; }
-        public string CreatorName { get; set; }
-        [ForeignKey("CreatorName")]
+        //public string CreatorName { get; set; }
+        //[ForeignKey("CreatorName")]
+
+        public string CreatorId { get; set; }
+        [ForeignKey("CreatorId")]
         public User User { get; set; }
 
         // one group can have multiple group members

@@ -10,6 +10,7 @@ using NEXT.GEN.Exceptions;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using FluentEmail.Core;
 
 namespace MinimalAPIConcepts.Services.Repository
 {
@@ -71,7 +72,14 @@ namespace MinimalAPIConcepts.Services.Repository
 
         public async Task<User> GetUserByEmailAsync(string email)
         {
-            return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+            if (user == null)
+            {
+                return null;
+            }
+
+            return user;
+
         }
 
         public async Task<ICollection<User>> GetUsersAsync()
@@ -107,6 +115,8 @@ namespace MinimalAPIConcepts.Services.Repository
             return user == null ? false : true;
         }
 
+        
+        // TODO -> handle login for new user. dto mapping
         public async Task<string> LoginWithGoogle(ClaimsPrincipal? claimsPrincipal)
         {
             if(claimsPrincipal == null)
@@ -116,14 +126,17 @@ namespace MinimalAPIConcepts.Services.Repository
 
             var email = claimsPrincipal.FindFirstValue(ClaimTypes.Email) ?? throw new ExternalLoginProviderException("Google", "Email is null");
 
+            // if the claimsPrincipal does not have email attached
             if (email == null)
             {
                 throw new ExternalLoginProviderException("Google", "Email is null");
             }
 
-
+            // check if we already have a user with the email, 
+            // meaning the user is already a member of our platform
             var user = await GetUserByEmailAsync(email);
 
+            // create a new user now
             if (user == null)
             {
                 var newUser = new User
@@ -134,17 +147,21 @@ namespace MinimalAPIConcepts.Services.Repository
                 };
 
                 var result = await CreateUserAsync(newUser);
-
+                
                 if (!result)
                 {
                     throw new ExternalLoginProviderException("Google","The user could not be created at the moment.");
                 }
+                
+                var getUser = GetUserByEmailAsync(newUser.Email);
+                var mapUser = _mapper.Map<User>(getUser);
+                var jwt = _tokenGenerator.GenerateToken(mapUser);
+                return jwt;
             }
 
+            // for user already exists
             var userName = claimsPrincipal.FindFirstValue(ClaimTypes.Name);
-
             var mappedUser = _mapper.Map<User>(user);
-
             var jwtToken = _tokenGenerator.GenerateToken(mappedUser);
             return jwtToken;
         }

@@ -14,14 +14,16 @@ namespace NEXT.GEN.Models
         [Key]
         public int FriendshipId { get; set; }
         // the curent user
-        public string UserName { get; set; }
-        [ForeignKey("UserName")]
+        //public string UserName { get; set; }
+        //[ForeignKey("UserName")]
+        public string UserId { get; set; }
+        [ForeignKey("UserId")]
         // navigation property for the first user
         public User User { get; set; }
 
         // the user the current user is friends with
-        public string AnotherUserName { get; set; }
-        [ForeignKey("AnotherUserName")]
+        public string FriendId { get; set; }
+        [ForeignKey("FriendId")]
         // navigation property for the second user
         public User Friend { get; set; }    
         public DateTime FriendshipDate { get; set; }

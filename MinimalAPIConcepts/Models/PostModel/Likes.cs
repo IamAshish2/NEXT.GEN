@@ -13,8 +13,8 @@ namespace NEXT.GEN.Models.PostModel
         [ForeignKey("PostId")]
         public CreatePost Post { get; set; }
 
-        public string UserName { get; set; }
-        [ForeignKey("UserName")]
+        public string UserId { get; set; }
+        [ForeignKey("UserId")]
         public User User { get; set; }
 
          // the group name is optional as the users can either interact with group posts or the posts of the user.
