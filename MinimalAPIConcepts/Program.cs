@@ -1,10 +1,6 @@
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using MinimalAPIConcepts.Context;
-using MinimalAPIConcepts.Models;
-using MinimalAPIConcepts.Services.Interfaces;
-using MinimalAPIConcepts.Services.Repository;
 using NEXT.GEN.Models.EmailModel;
 using NEXT.GEN.Services.Interfaces;
 using NEXT.GEN.Services.Repository;
@@ -16,10 +12,12 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
+using NEXT.GEN.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddHttpContextAccessor();
+
 
 // for resolving multiple object cycles
 /**
@@ -35,22 +33,22 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 // Add fluent email service to the application
 var smtp = builder.Configuration.GetSection("Smtp").Get<SmtpSettings>();
-builder.Services.AddFluentEmail(smtp.FromEmail,smtp.FromName)
+builder.Services.AddFluentEmail(smtp.FromEmail, smtp.FromName)
     .AddSmtpSender(new SmtpClient(smtp.Host)
     {
         Port = smtp.Port,
-        Credentials =  new NetworkCredential(smtp.FromEmail,smtp.Password),
+        Credentials = new NetworkCredential(smtp.FromEmail, smtp.Password),
         EnableSsl = smtp.EnableSsl,
     });
 
 // adding the cors policy for all origins default.
-builder.Services.AddCors( options => 
+builder.Services.AddCors(options =>
             options.AddPolicy("AllowAllOrigins",
             builder => builder.AllowAnyHeader().AllowAnyMethod().AllowCredentials().WithOrigins("http://localhost:5173"))
 );
 
 // Add Jwt configuration
-builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
+//builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
 
 /* previous configuration
 builder.Services.AddAuthentication(options =>
@@ -127,11 +125,12 @@ builder.Services.AddAuthentication(options =>
 
     options.Events.OnMessageReceived = context =>
     {
-        if(context.Request.Cookies.ContainsKey("auth_token") || context.Request.Cookies.ContainsKey("refresh_token"))
+        if (context.Request.Cookies.ContainsKey("auth_token") || context.Request.Cookies.ContainsKey("refresh_token"))
         {
             context.Token = context.Request.Cookies["auth_token"];
             //context. = context.Response.Cookies["refresh_token"];
-        };
+        }
+        ;
         return Task.CompletedTask;
     };
 })
@@ -144,34 +143,39 @@ builder.Services.AddAuthentication(options =>
     //the cookie is sent with requests from the same site and during top-level navigations to the cookie's domain
     //from a third-party site, helping to mitigate Cross-Site Request Forgery (CSRF) attacks. 
     options.Cookie.SameSite = SameSiteMode.None;
-    options.LoginPath = "/api/auth/login";  
-    options.LogoutPath = "/api/auth/logout"; 
+    options.LoginPath = "/api/auth/login";
+    options.LogoutPath = "/api/auth/logout";
 })
 .AddGoogle(options =>
 {
-    options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
-    options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+    // works only on local development as i set it with dotnet secret manager
+    //options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
+    //options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+
+
+    options.ClientId = builder.Configuration["GoogleKeys:ClientId"];
+    options.ClientSecret = builder.Configuration["GoogleKeys:CLIENTSECRET"];
     options.SaveTokens = true;
     options.UsePkce = true; // For OAuth2 providers that support it
 });
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Minimal Api Practice", Description = "Say hello minimal api", Version = "v1" });
+
+    //  define the security defination of the added security scheme
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
-        c.SwaggerDoc("v1", new OpenApiInfo { Title = "Minimal Api Practice", Description = "Say hello minimal api", Version = "v1" });
+        In = ParameterLocation.Header,
+        Name = "Bearer",
+        Type = SecuritySchemeType.Http,
+        Description = "Please enter the jwt token here for authorization",
+        Scheme = "bearer",
+        BearerFormat = "JWT"
+    });
 
-        //  define the security defination of the added security scheme
-        c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-        {
-            In = ParameterLocation.Header,
-            Name = "Bearer",
-            Type = SecuritySchemeType.Http,
-            Description = "Please enter the jwt token here for authorization",
-            Scheme = "bearer",
-            BearerFormat = "JWT"
-        });
-
-        c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
         {
              {
             new OpenApiSecurityScheme
@@ -185,7 +189,7 @@ builder.Services.AddSwaggerGen(c =>
             new string[]{}
         }
         });
-    }
+}
 );
 
 // Register controllers
@@ -195,26 +199,27 @@ builder.Services.AddControllers();
 //    options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
 //});
 
-// Database connection
-builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(
-    builder.Configuration.GetConnectionString("DefaultConnection")
-));
+// Database connection with azure sql
+var sqlConnection = builder.Configuration["ConnectionStrings:SqlDb"];
+builder.Services.AddSqlServer<ApplicationDbContext>(sqlConnection, options => options.EnableRetryOnFailure());
 
 // Dependency injection for repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<ITokenGenerator,TokenGenerator>();
-builder.Services.AddScoped<IEmailService,EmailService>();
-builder.Services.AddScoped<IFriendshipsRepository,FriendshipRepository>();
-builder.Services.AddScoped<IpostRepository, PostRepository>();
-builder.Services.AddScoped<IGroupRepository,GroupRepository>();
-builder.Services.AddScoped<IpostRepository,PostRepository>();
-builder.Services.AddScoped<IGroupMemberRepository,GroupMemberRepository>();
+builder.Services.AddScoped<ITokenGenerator, TokenGenerator>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IFriendshipsRepository, FriendshipRepository>();
+builder.Services.AddScoped<IGroupRepository, GroupRepository>();
+builder.Services.AddScoped<IPostRepository, PostRepository>();
+builder.Services.AddScoped<IGroupMemberRepository, GroupMemberRepository>();
 builder.Services.AddScoped<ILikeRepository, LikeRepository>();
-builder.Services.AddScoped<ICommentRepository,CommentRepository>();
+builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 
 
 
 var app = builder.Build();
+
+app.UseDeveloperExceptionPage();
+
 
 app.UseCors("AllowAllOrigins");
 app.UseAuthentication();
@@ -235,6 +240,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "Minimal Api Practice v1");
+        c.RoutePrefix = string.Empty;
     });
 }
 
