@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using MinimalAPIConcepts.Services.Interfaces;
 using NEXT.GEN.Dtos.LikeDto;
 using NEXT.GEN.Models.PostModel;
 using NEXT.GEN.Services.Interfaces;
@@ -17,14 +16,14 @@ namespace NEXT.GEN.Controllers
         IMapper mapper,
         IGroupRepository groupRepository,
         IUserRepository userRepository,
-        IpostRepository postRepository
+        IPostRepository postRepository
             ) : ControllerBase
     {
         private readonly ILikeRepository _likeRepository = likeRepository;
         private readonly IMapper _mapper = mapper;
         private readonly IGroupRepository _groupRepository = groupRepository;
         private readonly IUserRepository _userRepository = userRepository;
-        private readonly IpostRepository _postRepository = postRepository;
+        private readonly IPostRepository _postRepository = postRepository;
 
         [HttpPost("like-post")]
         [ProducesResponseType(200)]

@@ -10,14 +10,14 @@ namespace NEXT.GEN.Controllers
     [ApiController]
     public class PostController : ControllerBase
     {
-        private readonly IpostRepository _postRepository;
+        private readonly IPostRepository _postRepository;
         private readonly IMapper _mapper;
         private readonly IGroupRepository _groupRepository;
         private readonly IGroupMemberRepository _groupMemberRepository;
         private readonly ILogger<CreatePost> _logger;
 
         public PostController(
-            IpostRepository postRepository,
+            IPostRepository postRepository,
             IMapper mapper,IGroupRepository groupRepository,
             IGroupMemberRepository groupMemberRepository,
             ILogger<CreatePost> logger

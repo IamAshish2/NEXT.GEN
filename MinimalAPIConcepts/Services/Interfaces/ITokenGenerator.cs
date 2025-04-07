@@ -1,8 +1,6 @@
-﻿using MinimalAPIConcepts.Models;
-using System.Security.Claims;
-using System.Threading.Tasks;
+﻿using NEXT.GEN.Models;
 
-namespace MinimalAPIConcepts.Services.Interfaces
+namespace NEXT.GEN.Services.Interfaces
 {
     public interface ITokenGenerator
     {

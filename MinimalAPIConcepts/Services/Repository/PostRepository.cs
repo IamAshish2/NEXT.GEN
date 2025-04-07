@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using MinimalAPIConcepts.Context;
+using NEXT.GEN.Context;
 using NEXT.GEN.Dtos.CommentDto;
 using NEXT.GEN.Dtos.PostDto;
 using NEXT.GEN.Models.PostModel;
@@ -7,7 +7,7 @@ using NEXT.GEN.Services.Interfaces;
 
 namespace NEXT.GEN.Services.Repository
 {
-    public class PostRepository : IpostRepository
+    public class PostRepository : IPostRepository
     {
         private readonly ApplicationDbContext _context;
 

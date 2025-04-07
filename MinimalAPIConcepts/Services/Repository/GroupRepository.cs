@@ -1,11 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using MinimalAPIConcepts.Context;
 using NEXT.GEN.Dtos.GroupDto;
 using NEXT.GEN.Models;
 using NEXT.GEN.Models.PostModel;
 using NEXT.GEN.Services.Interfaces;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using NEXT.GEN.Context;
 
 namespace NEXT.GEN.Services.Repository
 {

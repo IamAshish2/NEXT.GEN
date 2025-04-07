@@ -1,10 +1,11 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using MinimalAPIConcepts.Dtos.UserDto;
-using MinimalAPIConcepts.Models;
-using MinimalAPIConcepts.Services.Interfaces;
+using NEXT.GEN.Dtos.Otp;
 using NEXT.GEN.Dtos.UserDto;
-using NEXT.GEN.Exception;
+using NEXT.GEN.ExceptionHandlers;
+using NEXT.GEN.Models;
+using NEXT.GEN.Services.Interfaces;
 
 namespace MinimalAPIConcepts.Controllers
 {
