@@ -1,18 +1,17 @@
-﻿using AutoMapper;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using MinimalAPIConcepts.Context;
-using MinimalAPIConcepts.Models;
-using MinimalAPIConcepts.Services.Interfaces;
+using NEXT.GEN.Context;
 using NEXT.GEN.Dtos.UserDto;
-using NEXT.GEN.Exceptions;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using FluentEmail.Core;
+using NEXT.GEN.ExceptionHandlers;
+using NEXT.GEN.Models;
+using NEXT.GEN.Services.Interfaces;
 
-namespace MinimalAPIConcepts.Services.Repository
+namespace NEXT.GEN.Services.Repository
 {
     public class UserRepository : IUserRepository
     {
@@ -43,6 +42,18 @@ namespace MinimalAPIConcepts.Services.Repository
 
                 _context.Users.Remove(user);
             }
+            return await SaveAsync();
+        }
+
+        public async Task<bool> ChangePasswordAsync(string email, string password)
+        {
+            // get the user
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+            if (user != null)
+            {
+              user.Password = password;
+            }
+
             return await SaveAsync();
         }
 
@@ -116,8 +127,11 @@ namespace MinimalAPIConcepts.Services.Repository
         }
 
         
-        // TODO -> handle login for new user. dto mapping
-        public async Task<string> LoginWithGoogle(ClaimsPrincipal? claimsPrincipal)
+        // TODO -> handle login for new user. dto mapping && if a user has already logged in to the system with email, then redirect to the home page directly.
+        
+        // TODO -> here, the user is being successfully logged in, but the user's information is not being set right
+        // TODO -> the user should receive cookies, the auth,username,userId,refresh token in their cookies
+        public async Task<User> LoginWithGoogle(ClaimsPrincipal? claimsPrincipal)
         {
             if(claimsPrincipal == null)
             {
@@ -153,17 +167,19 @@ namespace MinimalAPIConcepts.Services.Repository
                     throw new ExternalLoginProviderException("Google","The user could not be created at the moment.");
                 }
                 
-                var getUser = GetUserByEmailAsync(newUser.Email);
-                var mapUser = _mapper.Map<User>(getUser);
-                var jwt = _tokenGenerator.GenerateToken(mapUser);
-                return jwt;
+                var getUser = await GetUserByEmailAsync(newUser.Email);
+                return getUser;
+                // var mapUser = _mapper.Map<User>(getUser);
+                // var jwt = _tokenGenerator.GenerateToken(mapUser);
+                // return jwt;
             }
 
             // for user already exists
-            var userName = claimsPrincipal.FindFirstValue(ClaimTypes.Name);
+            // var userName = claimsPrincipal.FindFirstValue(ClaimTypes.Name);
             var mappedUser = _mapper.Map<User>(user);
-            var jwtToken = _tokenGenerator.GenerateToken(mappedUser);
-            return jwtToken;
+            return mappedUser;
+            // var jwtToken = _tokenGenerator.GenerateToken(mappedUser);
+            // return jwtToken;
         }
 
         public ClaimsPrincipal validateJWT(string token)

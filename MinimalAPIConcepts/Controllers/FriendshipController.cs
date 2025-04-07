@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using MinimalAPIConcepts.Services.Interfaces;
 using NEXT.GEN.Dtos.FriendshipDto;
 using NEXT.GEN.Models;
 using NEXT.GEN.Services.Interfaces;

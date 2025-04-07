@@ -1,8 +1,8 @@
-﻿using MinimalAPIConcepts.Models;
+﻿using System.Security.Claims;
 using NEXT.GEN.Dtos.UserDto;
-using System.Security.Claims;
+using NEXT.GEN.Models;
 
-namespace MinimalAPIConcepts.Services.Interfaces
+namespace NEXT.GEN.Services.Interfaces
 {
     public interface IUserRepository
     {
@@ -13,12 +13,13 @@ namespace MinimalAPIConcepts.Services.Interfaces
         Task<bool> CreateUserAsync(User newUser);
         Task<bool> UpdateUserAsync(User user);
         Task<bool> DeleteUserAsync(string UserName);
+        Task<bool> ChangePasswordAsync(string email, string password);
         Task<bool> isEmailInUse(string Email);
         Task<bool> isUserNameInUse(string userName);
         Task<bool> checkIfUserExists(string UserName);
         Task<bool> SaveAsync();
         // check the authentication state of the user
         ClaimsPrincipal validateJWT(string token);
-        Task<string> LoginWithGoogle(ClaimsPrincipal? claimsPrincipal);
+        Task<User> LoginWithGoogle(ClaimsPrincipal? claimsPrincipal);
     }
 }

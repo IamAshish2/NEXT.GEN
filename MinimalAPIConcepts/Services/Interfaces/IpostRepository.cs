@@ -3,7 +3,7 @@ using NEXT.GEN.Models.PostModel;
 
 namespace NEXT.GEN.Services.Interfaces
 {
-    public interface IpostRepository
+    public interface IPostRepository
     {
         // get all posts by all users
         Task<ICollection<CreatePost>> GetAllPosts();

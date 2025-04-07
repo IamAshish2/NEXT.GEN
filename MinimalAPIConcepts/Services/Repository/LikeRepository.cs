@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using MinimalAPIConcepts.Context;
+using NEXT.GEN.Context;
 using NEXT.GEN.Dtos.LikeDto;
 using NEXT.GEN.Models.PostModel;
 using NEXT.GEN.Services.Interfaces;

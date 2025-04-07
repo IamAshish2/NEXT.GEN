@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using MinimalAPIConcepts.Context;
+using NEXT.GEN.Context;
 using NEXT.GEN.Dtos.FriendshipDto;
 using NEXT.GEN.Dtos.UserDto;
 using NEXT.GEN.Models;

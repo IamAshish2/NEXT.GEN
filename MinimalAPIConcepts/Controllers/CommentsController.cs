@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using MinimalAPIConcepts.Services.Interfaces;
 using NEXT.GEN.Dtos.CommentDto;
 using NEXT.GEN.Models.PostModel;
 using NEXT.GEN.Services.Interfaces;
@@ -10,12 +9,12 @@ namespace NEXT.GEN.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CommentsController(IMapper mapper, ICommentRepository commentRepository, IpostRepository postRepository,
+    public class CommentsController(IMapper mapper, ICommentRepository commentRepository, IPostRepository postRepository,
         IUserRepository userRepository) : ControllerBase
     {
         private readonly IMapper _mapper = mapper;
         private readonly ICommentRepository _commentRepository = commentRepository;
-        private readonly IpostRepository _postRepository = postRepository;
+        private readonly IPostRepository _postRepository = postRepository;
         private readonly IUserRepository _userRepository = userRepository;
 
         [HttpPost("comment")]

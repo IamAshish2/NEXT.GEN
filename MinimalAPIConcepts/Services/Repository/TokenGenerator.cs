@@ -1,16 +1,15 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
-using MinimalAPIConcepts.Context;
-using MinimalAPIConcepts.Models;
-using MinimalAPIConcepts.Services.Interfaces;
-using NEXT.GEN.Models;
-using System.IdentityModel.Tokens.Jwt;
+﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using NEXT.GEN.Context;
+using NEXT.GEN.Models;
+using NEXT.GEN.Services.Interfaces;
 
-namespace MinimalAPIConcepts.Services.Repository
+namespace NEXT.GEN.Services.Repository
 {
     public class TokenGenerator: ITokenGenerator
     {

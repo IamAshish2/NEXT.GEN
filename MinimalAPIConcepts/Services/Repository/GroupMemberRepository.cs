@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using MinimalAPIConcepts.Context;
-using MinimalAPIConcepts.Models;
+using NEXT.GEN.Context;
 using NEXT.GEN.Dtos.GroupMembersDto;
 using NEXT.GEN.Dtos.UserDto;
 using NEXT.GEN.Models;
