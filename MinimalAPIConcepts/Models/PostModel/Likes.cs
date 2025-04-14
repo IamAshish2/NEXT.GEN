@@ -1,5 +1,4 @@
-﻿using MinimalAPIConcepts.Models;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NEXT.GEN.Models.PostModel

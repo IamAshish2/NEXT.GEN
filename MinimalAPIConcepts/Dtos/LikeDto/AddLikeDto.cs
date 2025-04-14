@@ -2,7 +2,7 @@
 {
     public class AddLikeDto
     {
-        public string UserName { get; set; }    
+        public string? userId { get; set; }    
         public int PostId { get; set; }
 
         // group name is optional because the user can post specific to their own profile as well,

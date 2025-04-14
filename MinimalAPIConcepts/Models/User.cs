@@ -1,9 +1,8 @@
-﻿using Microsoft.AspNetCore.Identity;
-using NEXT.GEN.Models;
+﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Identity;
 using NEXT.GEN.Models.PostModel;
-using System.ComponentModel.DataAnnotations;
 
-namespace MinimalAPIConcepts.Models
+namespace NEXT.GEN.Models
 {
     public class User : IdentityUser
     {

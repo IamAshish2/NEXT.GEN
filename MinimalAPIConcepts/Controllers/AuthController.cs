@@ -30,11 +30,13 @@ namespace MinimalAPIConcepts.Controllers
         private readonly IOtpRepository _otpRepository;
         private readonly IEmailService _emailService;
         private readonly IWebHostEnvironment _environment;
+        private readonly ILogger<AuthController> _logger;
         private readonly JwtSettings _jwtSettings;
 
         public AuthController(ApplicationDbContext context, IMapper mapper ,IHttpContextAccessor  httpContextAccessor ,
             ITokenGenerator tokenGenerator, IOptions<JwtSettings> jwtSettings, IUserRepository userRepository,
-            IOtpRepository otpRepository, IEmailService emailService, IWebHostEnvironment environment)
+            IOtpRepository otpRepository, IEmailService emailService, IWebHostEnvironment environment,
+            ILogger<AuthController> logger)
         {
             _context = context;
             _mapper = mapper;
@@ -44,6 +46,7 @@ namespace MinimalAPIConcepts.Controllers
             _otpRepository = otpRepository;
             _emailService = emailService;
             _environment = environment;
+            _logger = logger;
             _jwtSettings = jwtSettings.Value;
         }
 
@@ -219,116 +222,20 @@ namespace MinimalAPIConcepts.Controllers
                 // if the email does exist, then send a otp to the user's email
                 var code = await  _otpRepository.GenerateRandomOtp();
                 
+                // save the otp with the email in the cache 
+                // now the user will get the code and when the user enters the code before expiry time,
+                // we can check it from the cache and verify the code to let the uesr reset the password
                 // before sending the generated code to the user, save the code along with the user's email in the cache memory
-                await _otpRepository.storeOtpForResetingPassword(email,code);
+                // await _otpRepository.storeOtpForResetingPassword(email,code);
+                var normalizedEmail = email.Trim().ToLower();
+                await _otpRepository.storeOtpForResetingPassword(normalizedEmail,code);
+
+                _logger.LogInformation("OTP stored for email: {Email}, OTP: {OTP}", email, code);
+
                 
-                // now send the code to the user's email
-//                   string emailBody = $@"
-//                                 <!DOCTYPE html>
-//                                 <html lang=""en"">
-//                                 <head>
-//                                     <meta charset=""UTF-8"">
-//                                     <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">
-//                                     <title>Verify Your Email Address</title>
-//                                     <style>
-//                                         body {{
-//                                             font-family: sans-serif;
-//                                             line-height: 1.6;
-//                                             color: #333;
-//                                             background-color: #f4f4f4;
-//                                             margin: 0;
-//                                             padding: 0;
-//                                         }}
-//                                         .container {{
-//                                             max-width: 600px;
-//                                             margin: 20px auto;
-//                                             background-color: #fff;
-//                                             padding: 30px;
-//                                             border-radius: 8px;
-//                                             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-//                                         }}
-//                                         h1 {{
-//                                             color: #007bff;
-//                                             margin-bottom: 20px;
-//                                             text-align: center;
-//                                         }}
-//                                         p {{
-//                                             margin-bottom: 15px;
-//                                         }}
-//                                         .otp-container {{
-//                                             background-color: #e9ecef;
-//                                             padding: 15px;
-//                                             border-radius: 6px;
-//                                             text-align: center;
-//                                             margin-bottom: 20px;
-//                                         }}
-//                                         .otp {{
-//                                             font-size: 24px;
-//                                             font-weight: bold;
-//                                             color: #28a745;
-//                                             letter-spacing: 10px;
-//                                         }}
-//                                         .button {{
-//                                             display: inline-block;
-//                                             background-color: #007bff;
-//                                             color: #fff;
-//                                             padding: 10px 20px;
-//                                             text-decoration: none;
-//                                             border-radius: 5px;
-//                                         }}
-//                                         .button:hover {{
-//                                             background-color: #0056b3;
-//                                         }}
-//                                         .disclaimer {{
-//                                             font-size: 0.8em;
-//                                             color: #777;
-//                                             margin-top: 20px;
-//                                         }}
-//                                         .footer {{
-//                                             margin-top: 30px;
-//                                             text-align: center;
-//                                             color: #777;
-//                                             font-size: 0.9em;
-//                                         }}
-//                                     </style>
-//                                 </head>
-//                                 <body>
-//                                     <div class=""container"">
-//                                         <h1>Password Reset Request</h1>
-//                                         <p>Hello,</p>
-//                                         <p>We received a request to reset your password for your NEXT.GEN account. To complete the password reset process, please use the following One-Time Password (OTP):</p>
-//                                         <div class=""otp-container"">
-//                                             <span class=""otp"">{code}</span>
-//                                         </div>
-//
-//                                         <p>This OTP is valid for 15 minutes. If you didn't request a password reset, please ignore this email or contact our support team immediately.</p>
-//
-//                                          <p>For security reasons:</p>
-//                                         <ul>
-//                                             <li>Never share this OTP with anyone</li>
-//                                             <li>Our team will never ask for your OTP</li>
-//                                             <li>The OTP will expire after use</li>
-//                                         </ul>
-//
-//                                         <p>If you need any assistance, please contact our <a href=""{{SupportLink}}"">support team</a>.</p>
-//
-//                                         <div class=""disclaimer"">
-//                                             <p>This is an automatically generated email. Please do not reply to this message.</p>
-//                                         </div>
-//
-//                                         <div class=""footer"">
-//                                             &copy; @{DateTime.UtcNow.Year} NEXT.GEN. All rights reserved.<br>
-//                                             <a href=""{{CompanyLink}}"">Visit our website</a> | <a href=""{{PrivacyLink}}"">Privacy Policy</a>
-//                                         </div>
-//                                     </div>
-//
-//                             </body>
-//                   </html>";
-
-
                 // trying to read the html file from global folder
                 var path = Path.Combine(_environment.ContentRootPath,"global","EmailTemplates","ForgotPasswordCodeRequest.html");
-                string emailBody = await System.IO.File.ReadAllTextAsync(path);
+                var emailBody = await System.IO.File.ReadAllTextAsync(path);
                 emailBody = emailBody.Replace("{code}",code);
                 emailBody = emailBody.Replace("{DateTime.UtcNow.Year}",DateTime.UtcNow.Year.ToString());
                 
@@ -341,12 +248,19 @@ namespace MinimalAPIConcepts.Controllers
                   });
               }
 
-              return Ok();
+              return Ok(new SuccessResponse
+              {
+                  Message = "Please check your email for verification code.",
+                  Severity = "success"
+              });
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
-                throw;
+                return BadRequest(new ErrorResponse
+                {
+                    Message = "Please try again later. The request couldn't be fulfilled right now.",
+                    ErrorCode = "Failed"
+                });
             }
         }
 
@@ -359,12 +273,19 @@ namespace MinimalAPIConcepts.Controllers
         {
             try
             {
-                string storedCode = await _otpRepository.getStoredOtpAsync(request.Email);
-                if (! String.Equals(storedCode, request.Code))
+                _logger.LogInformation("The requested email is" + request.Email);
+                // var storedCode = await _otpRepository.getStoredOtpForResettingPassword(request.Email);
+                var normalizedEmail = request.Email.Trim().ToLower();
+                var storedCode = await _otpRepository.getStoredOtpForResettingPassword(normalizedEmail);
+                _logger.LogInformation("The stored code is " + storedCode);
+                _logger.LogInformation("Stored OTP: {Stored}, Provided OTP: {Provided}", storedCode, request.Code);
+
+                if (string.IsNullOrWhiteSpace(storedCode) || string.IsNullOrWhiteSpace(request.Code) ||
+                    !string.Equals(storedCode.Trim(), request.Code.Trim(), StringComparison.Ordinal))
                 {
                     return Unauthorized(new ErrorResponse
                     {
-                        Message = "Sorry, the code did not match. Check again and try.",
+                        Message = "Sorry, the code did not match. Check again and try. laude",
                         ErrorCode = "NO_MATCH"
                     });
                 }
