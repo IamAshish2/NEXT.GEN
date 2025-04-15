@@ -1,4 +1,4 @@
-﻿namespace MinimalAPIConcepts.Models
+﻿namespace NEXT.GEN.Models
 {
     public class JwtSettings
     { 

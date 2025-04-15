@@ -1,10 +1,9 @@
-﻿
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using MinimalAPIConcepts.Models;
 using NEXT.GEN.Models;
 using NEXT.GEN.Models.PostModel;
-namespace MinimalAPIConcepts.Context
+
+namespace NEXT.GEN.Context
 {
     public class ApplicationDbContext : IdentityDbContext<User>
     {
@@ -14,6 +13,8 @@ namespace MinimalAPIConcepts.Context
         }
 
         public DbSet<RefreshToken> RefreshTokens { get; set; }
+        // override the default identity users table
+        override 
         public DbSet<User> Users { get; set; }
         public DbSet<Friendships> Friends { get; set; }
         public DbSet<Group> Groups { get; set; }

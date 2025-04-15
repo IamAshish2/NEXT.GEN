@@ -32,12 +32,37 @@ namespace NEXT.GEN.Services.Repository
             return Task.FromResult(new string(code));
         }
 
+        // public Task storeOtpForResetingPassword(string email, string otp)
+        // {
+        //     // the otp service is only availabe for 5 minutes
+        //     cache.Set(email + "_forgotPasswordServiceOtp" , otp, TimeSpan.FromMinutes(5));
+        //     return Task.CompletedTask;
+        // }
+        //
+        // public Task <string>getStoredOtpForResettingPassword(string email)
+        // {
+        //     // the otp we stored in the email
+        //     cache.TryGetValue(email + "_forgotPasswordServiceOtp", out string otp);
+        //     return Task.FromResult(otp);
+        // }
+        
         public Task storeOtpForResetingPassword(string email, string otp)
         {
-            // the otp service is only availabe for 5 minutes
-            cache.Set(email + "_forgotPasswordServiceOtp" , otp, TimeSpan.FromMinutes(5));
+            var key = email.ToLower() + "_forgotPasswordServiceOtp";
+            Console.WriteLine("Storing OTP in cache with key: " + key + " and value: " + otp);
+            cache.Set(key, otp, TimeSpan.FromMinutes(5));
             return Task.CompletedTask;
         }
+
+        public Task<string> getStoredOtpForResettingPassword(string email)
+        {
+            var key = email.ToLower() + "_forgotPasswordServiceOtp";
+            cache.TryGetValue(key, out string otp);
+            Console.WriteLine("Retrieving OTP from cache with key: " + key + ", got value: " + otp);
+            return Task.FromResult(otp);
+        }
+
+
 
         public Task<string> getStoredOtpAsync(string email)
         {

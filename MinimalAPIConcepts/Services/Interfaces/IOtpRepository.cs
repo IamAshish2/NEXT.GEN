@@ -12,6 +12,7 @@ namespace NEXT.GEN.Services.Interfaces
         
         // for use when the user requests forget password service
         Task storeOtpForResetingPassword(string email, string otp);
+        Task<string> getStoredOtpForResettingPassword(string email);
         Task<string> getStoredOtpAsync(string email);
         Task<CreateUserDto> getStoredUserDto(string email);
         Task deleteOtp(string email);

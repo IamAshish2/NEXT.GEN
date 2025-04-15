@@ -1,5 +1,4 @@
-﻿using MinimalAPIConcepts.Models;
-using NEXT.GEN.Dtos.UserDto;
+﻿using NEXT.GEN.Dtos.UserDto;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NEXT.GEN.Dtos.FriendshipDto
