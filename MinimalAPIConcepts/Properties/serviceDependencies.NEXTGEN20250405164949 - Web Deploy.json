@@ -1,0 +1,12 @@
+{
+  "dependencies": {
+    "mssql2": {
+      "serviceConnectorResourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('serviceConnectorResourceGroupName')]/providers/Microsoft.Web/sites/NEXTGEN20250405164949/providers/Microsoft.ServiceLinker/linkers/ConnectionStringsSqlDb_C9C3C52C08",
+      "secretStore": "AzureAppSettings",
+      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.Sql/servers/dispatchsqlservernextgen/databases/NEXT.GEN_db",
+      "type": "mssql.azure",
+      "connectionId": "ConnectionStrings:SqlDb",
+      "dynamicId": null
+    }
+  }
+}

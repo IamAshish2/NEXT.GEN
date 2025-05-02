@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace NEXT.GEN.Migrations
 {
     /// <inheritdoc />
-    public partial class update_id_based_user : Migration
+    public partial class totheazure : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -236,8 +236,7 @@ namespace NEXT.GEN.Migrations
                     JoinDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     MemberId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     GroupName = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    HasJoined = table.Column<bool>(type: "bit", nullable: false),
-                    CreatorId = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    HasJoined = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -293,8 +292,7 @@ namespace NEXT.GEN.Migrations
                     Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     PostId = table.Column<int>(type: "int", nullable: false),
-                    CommentDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatorId = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    CommentDate = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -345,8 +343,7 @@ namespace NEXT.GEN.Migrations
                     PostId = table.Column<int>(type: "int", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     GroupName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    LikedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatorId = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    LikedDate = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
