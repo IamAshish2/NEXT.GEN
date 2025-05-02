@@ -5,15 +5,15 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using MinimalAPIConcepts.Context;
+using NEXT.GEN.Context;
 
 #nullable disable
 
 namespace NEXT.GEN.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250403061556_updateee")]
-    partial class updateee
+    [Migration("20250405150849_totheazure")]
+    partial class totheazure
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -158,93 +158,6 @@ namespace NEXT.GEN.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("MinimalAPIConcepts.Models.User", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("AccessFailedCount")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Address")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Bio")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Course")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Email")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<bool>("EmailConfirmed")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("FullName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("LockoutEnabled")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTimeOffset?>("LockoutEnd")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("NormalizedEmail")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<string>("NormalizedUserName")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PasswordHash")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("PhoneNumberConfirmed")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("SecurityStamp")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.PrimitiveCollection<string>("Skills")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.PrimitiveCollection<string>("Socials")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("TwoFactorEnabled")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("UserName")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("NormalizedEmail")
-                        .HasDatabaseName("EmailIndex");
-
-                    b.HasIndex("NormalizedUserName")
-                        .IsUnique()
-                        .HasDatabaseName("UserNameIndex")
-                        .HasFilter("[NormalizedUserName] IS NOT NULL");
-
-                    b.ToTable("AspNetUsers", (string)null);
-                });
-
             modelBuilder.Entity("NEXT.GEN.Models.Friendships", b =>
                 {
                     b.Property<int>("FriendshipId")
@@ -353,10 +266,6 @@ namespace NEXT.GEN.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("CreatorId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("PostId")
                         .HasColumnType("int");
 
@@ -448,10 +357,6 @@ namespace NEXT.GEN.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LikeId"));
 
-                    b.Property<string>("CreatorId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("GroupName")
                         .HasColumnType("nvarchar(max)");
 
@@ -498,6 +403,93 @@ namespace NEXT.GEN.Migrations
                     b.ToTable("RefreshTokens");
                 });
 
+            modelBuilder.Entity("NEXT.GEN.Models.User", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("AccessFailedCount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Address")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Bio")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Course")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("FullName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("LockoutEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTimeOffset?>("LockoutEnd")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("NormalizedEmail")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("NormalizedUserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("PhoneNumberConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("SecurityStamp")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.PrimitiveCollection<string>("Skills")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.PrimitiveCollection<string>("Socials")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("TwoFactorEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("UserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedEmail")
+                        .HasDatabaseName("EmailIndex");
+
+                    b.HasIndex("NormalizedUserName")
+                        .IsUnique()
+                        .HasDatabaseName("UserNameIndex")
+                        .HasFilter("[NormalizedUserName] IS NOT NULL");
+
+                    b.ToTable("AspNetUsers", (string)null);
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -509,7 +501,7 @@ namespace NEXT.GEN.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("MinimalAPIConcepts.Models.User", null)
+                    b.HasOne("NEXT.GEN.Models.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -518,7 +510,7 @@ namespace NEXT.GEN.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("MinimalAPIConcepts.Models.User", null)
+                    b.HasOne("NEXT.GEN.Models.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -533,7 +525,7 @@ namespace NEXT.GEN.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("MinimalAPIConcepts.Models.User", null)
+                    b.HasOne("NEXT.GEN.Models.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -542,7 +534,7 @@ namespace NEXT.GEN.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("MinimalAPIConcepts.Models.User", null)
+                    b.HasOne("NEXT.GEN.Models.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -551,13 +543,13 @@ namespace NEXT.GEN.Migrations
 
             modelBuilder.Entity("NEXT.GEN.Models.Friendships", b =>
                 {
-                    b.HasOne("MinimalAPIConcepts.Models.User", "Friend")
+                    b.HasOne("NEXT.GEN.Models.User", "Friend")
                         .WithMany()
                         .HasForeignKey("FriendId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("MinimalAPIConcepts.Models.User", "User")
+                    b.HasOne("NEXT.GEN.Models.User", "User")
                         .WithMany("UserFriendships")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -570,7 +562,7 @@ namespace NEXT.GEN.Migrations
 
             modelBuilder.Entity("NEXT.GEN.Models.Group", b =>
                 {
-                    b.HasOne("MinimalAPIConcepts.Models.User", "User")
+                    b.HasOne("NEXT.GEN.Models.User", "User")
                         .WithMany("CreatedGroups")
                         .HasForeignKey("CreatorId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -587,7 +579,7 @@ namespace NEXT.GEN.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("MinimalAPIConcepts.Models.User", "User")
+                    b.HasOne("NEXT.GEN.Models.User", "User")
                         .WithMany("GroupMember")
                         .HasForeignKey("MemberId")
                         .OnDelete(DeleteBehavior.NoAction)
@@ -606,7 +598,7 @@ namespace NEXT.GEN.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("MinimalAPIConcepts.Models.User", "User")
+                    b.HasOne("NEXT.GEN.Models.User", "User")
                         .WithMany("Comments")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.NoAction)
@@ -619,7 +611,7 @@ namespace NEXT.GEN.Migrations
 
             modelBuilder.Entity("NEXT.GEN.Models.PostModel.CreatePost", b =>
                 {
-                    b.HasOne("MinimalAPIConcepts.Models.User", "User")
+                    b.HasOne("NEXT.GEN.Models.User", "User")
                         .WithMany("Posts")
                         .HasForeignKey("CreatorId")
                         .OnDelete(DeleteBehavior.NoAction)
@@ -644,7 +636,7 @@ namespace NEXT.GEN.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("MinimalAPIConcepts.Models.User", "User")
+                    b.HasOne("NEXT.GEN.Models.User", "User")
                         .WithMany("Dislikes")
                         .HasForeignKey("UserName")
                         .OnDelete(DeleteBehavior.NoAction)
@@ -663,7 +655,7 @@ namespace NEXT.GEN.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("MinimalAPIConcepts.Models.User", "User")
+                    b.HasOne("NEXT.GEN.Models.User", "User")
                         .WithMany("Likes")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.NoAction)
@@ -672,23 +664,6 @@ namespace NEXT.GEN.Migrations
                     b.Navigation("Post");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("MinimalAPIConcepts.Models.User", b =>
-                {
-                    b.Navigation("Comments");
-
-                    b.Navigation("CreatedGroups");
-
-                    b.Navigation("Dislikes");
-
-                    b.Navigation("GroupMember");
-
-                    b.Navigation("Likes");
-
-                    b.Navigation("Posts");
-
-                    b.Navigation("UserFriendships");
                 });
 
             modelBuilder.Entity("NEXT.GEN.Models.Group", b =>
@@ -705,6 +680,23 @@ namespace NEXT.GEN.Migrations
                     b.Navigation("Dislikes");
 
                     b.Navigation("Likes");
+                });
+
+            modelBuilder.Entity("NEXT.GEN.Models.User", b =>
+                {
+                    b.Navigation("Comments");
+
+                    b.Navigation("CreatedGroups");
+
+                    b.Navigation("Dislikes");
+
+                    b.Navigation("GroupMember");
+
+                    b.Navigation("Likes");
+
+                    b.Navigation("Posts");
+
+                    b.Navigation("UserFriendships");
                 });
 #pragma warning restore 612, 618
         }

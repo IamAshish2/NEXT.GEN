@@ -5,7 +5,7 @@
 namespace NEXT.GEN.Migrations
 {
     /// <inheritdoc />
-    public partial class updateDatabase : Migration
+    public partial class tolocal : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

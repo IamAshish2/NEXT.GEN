@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+This file is used by the publish/package process of your Web project. You can customize the behavior of this process
+by editing this MSBuild file. In order to learn more about this please visit https://go.microsoft.com/fwlink/?LinkID=208121. 
+-->
+<Project>
+  <PropertyGroup>
+    <TimeStampOfAssociatedLegacyPublishXmlFile />
+    <History>True|2025-04-05T15:34:33.5703685Z||;True|2025-04-05T21:18:02.9409171+05:45||;True|2025-04-05T20:55:02.3841989+05:45||;True|2025-04-05T20:53:09.7020645+05:45||;False|2025-04-05T20:51:50.6291744+05:45||;True|2025-04-05T19:49:54.8000877+05:45||;</History>
+    <LastFailureDetails />
+  </PropertyGroup>
+  <ItemGroup>
+    <AzureDBConnectionStrings Include="Data Source=dispatchsqlservernextgen.database.windows.net,1433;Initial Catalog=NEXT.GEN_db;Authentication=ActiveDirectoryManagedIdentity" />
+    <AzureDBConnectionStrings Include="Data Source=sqlserver-nextgen-001.database.windows.net,1433;Initial Catalog=sqlDb-nextgen;Authentication=ActiveDirectoryManagedIdentity" />
+    <AzureDBConnectionStrings Include="REDACTED" />
+    <AzureDBConnectionStrings Include="Server=tcp:dispatchsqlservernextgen.database.windows.net;Authentication=Active Directory Default;Database=NEXT.GEN_db" />
+    <AzureDBConnectionStrings Include="Server=tcp:sqlserver-nextgen-001.database.windows.net;Authentication=Active Directory Default;Database=sqlDb-nextgen" />
+  </ItemGroup>
+</Project>
