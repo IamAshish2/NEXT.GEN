@@ -16,6 +16,7 @@ namespace NEXT.GEN.Context
         // override the default identity users table
         override 
         public DbSet<User> Users { get; set; }
+        public DbSet<ProfilePicture> ProfilePictures { get; set; }
         public DbSet<Friendships> Friends { get; set; }
         public DbSet<Group> Groups { get; set; }
         public DbSet<GroupMembers> GroupMembers { get; set; }
