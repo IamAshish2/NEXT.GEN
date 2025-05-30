@@ -7,21 +7,22 @@ namespace NEXT.GEN.Context
 {
     public class ApplicationDbContext : IdentityDbContext<User>
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options): base(options)
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
-            
         }
 
         public DbSet<RefreshToken> RefreshTokens { get; set; }
+
         // override the default identity users table
-        override 
-        public DbSet<User> Users { get; set; }
+        override
+            public DbSet<User> Users { get; set; }
+
         public DbSet<ProfilePicture> ProfilePictures { get; set; }
-        public DbSet<Friendships> Friends { get; set; }
+        public DbSet<Friends> Friends { get; set; }
         public DbSet<Group> Groups { get; set; }
         public DbSet<GroupMembers> GroupMembers { get; set; }
         public DbSet<CreatePost> Posts { get; set; }
-        public DbSet<Likes> Likes { get; set; } 
+        public DbSet<Likes> Likes { get; set; }
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Dislike> Dislikes { get; set; }
 
@@ -38,13 +39,13 @@ namespace NEXT.GEN.Context
             base.OnModelCreating(modelBuilder);
 
 
-            modelBuilder.Entity<Friendships>()
+            modelBuilder.Entity<Friends>()
                 .HasOne(f => f.User)
-                .WithMany(f => f.UserFriendships)
+                .WithMany(f => f.Friends)
                 .HasForeignKey(f => f.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            //modelBuilder.Entity<Friendships>()
+            //modelBuilder.Entity<Friends>()
             //    .HasOne(f => f.Friend)
             //    .WithMany(f => f.FriendsFriendships)
             //    .HasForeignKey(f => f.UserName)
@@ -64,13 +65,13 @@ namespace NEXT.GEN.Context
             // one user can join multiple groups
             modelBuilder.Entity<GroupMembers>()
                 .HasOne(g => g.User)
-                .WithMany(g => g.GroupMember)
+                .WithMany(g => g.GroupMembers)
                 .HasForeignKey(g => g.MemberId)
                 .OnDelete(DeleteBehavior.NoAction);
-                //.OnDelete(DeleteBehavior.Cascade);
+            //.OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<GroupMembers>()
-              .HasIndex(u => new { u.GroupMemberId, u.GroupName }).IsUnique();
+                .HasIndex(u => new { u.GroupMemberId, u.GroupName }).IsUnique();
 
             // 
             modelBuilder.Entity<Comment>().HasKey(c => c.CommentId);
@@ -90,10 +91,10 @@ namespace NEXT.GEN.Context
             modelBuilder.Entity<Likes>().HasKey(l => l.LikeId);
 
             modelBuilder.Entity<Likes>()
-               .HasOne(c => c.User)
-               .WithMany(c => c.Likes)
-               .HasForeignKey(c => c.UserId)
-               .OnDelete(DeleteBehavior.NoAction);
+                .HasOne(c => c.User)
+                .WithMany(c => c.Likes)
+                .HasForeignKey(c => c.UserId)
+                .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<Likes>()
                 .HasOne(c => c.Post)
@@ -103,12 +104,12 @@ namespace NEXT.GEN.Context
 
             modelBuilder.Entity<Dislike>().HasKey(l => l.DislikeId);
             modelBuilder.Entity<Dislike>()
-               .HasOne(c => c.User)
-               .WithMany(c => c.Dislikes)
-               .HasForeignKey(c => c.UserName)
-               .OnDelete(DeleteBehavior.NoAction);
+                .HasOne(c => c.User)
+                .WithMany(c => c.Dislikes)
+                .HasForeignKey(c => c.UserName)
+                .OnDelete(DeleteBehavior.NoAction);
 
-           modelBuilder.Entity<Dislike>()
+            modelBuilder.Entity<Dislike>()
                 .HasOne(c => c.Post)
                 .WithMany(c => c.Dislikes)
                 .HasForeignKey(c => c.PostId)
@@ -116,10 +117,10 @@ namespace NEXT.GEN.Context
 
             modelBuilder.Entity<CreatePost>().HasKey(p => p.PostId);
             modelBuilder.Entity<CreatePost>()
-               .HasOne(p => p.User)
-               .WithMany(u => u.Posts)
-               .HasForeignKey(p => p.CreatorId)
-               .OnDelete(DeleteBehavior.NoAction);
+                .HasOne(p => p.User)
+                .WithMany(u => u.Posts)
+                .HasForeignKey(p => p.CreatorId)
+                .OnDelete(DeleteBehavior.NoAction);
         }
     }
 }

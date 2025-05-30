@@ -49,7 +49,7 @@ namespace NEXT.GEN.Controllers
                     return NotFound();
                 }
 
-                var friendshipMap = _mapper.Map<Friendships>(addNewFriend);
+                var friendshipMap = _mapper.Map<Friends>(addNewFriend);
 
                 if(! await _friendshipsRepository.AddFriend(friendshipMap))
                 {

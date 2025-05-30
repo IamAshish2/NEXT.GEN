@@ -6,17 +6,17 @@ namespace NEXT.GEN.Services.Interfaces
 {
     public interface IFriendshipsRepository
     {
-        Task<ActionResult<ICollection<Friendships>>> GetAllFriendships();
+        Task<ActionResult<ICollection<Friends>>> GetAllFriendships();
         // get all friends of the user
         Task<ActionResult<ICollection<GetUsersFriendshipsDto>>> GetUsersFriends(string userId);
         // add friend for a user
 
         Task<bool> CheckIfFriendshipAlreadyExists(string requestorUserId,string requestedUserId);
-        Task<bool> AddFriend(Friendships newFriend);
+        Task<bool> AddFriend(Friends newFriend);
         // remove an existing friend of a user
-        Task<bool> RemoveFriend(Friendships friend);
+        Task<bool> RemoveFriend(Friends friend);
         // get the whole friendship row from the table.
-        Task<Friendships> GetFriendship(string requestorUserId, string requestedUserId);
+        Task<Friends> GetFriendship(string requestorUserId, string requestedUserId);
         Task<bool> Save();
     }
 }

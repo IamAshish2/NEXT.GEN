@@ -18,27 +18,21 @@ namespace NEXT.GEN.Models
         [MaxLength(500)]
         public string? Bio { get; set; }
 
-        [MaxLength(100)]
+        [MaxLength(100)]    
         public string? Course { get; set; }
 
         [MaxLength(200)]
         public string? Address { get; set; }
         public ICollection<string>? Socials { get; set; } = new List<string>();
         public ICollection<string>? Skills { get; set; } = new List<string>();
-
-        // relationships
-        //public ICollection<RefreshToken> RefreshTokens { get; set; }    
         public ICollection<CreatePost> Posts { get; set; } = new List<CreatePost>();
         public ICollection<Likes> Likes { get; set; } = new List<Likes>();
         public ICollection<Dislike> Dislikes { get; set; } = new List<Dislike>();
         public ICollection<Comment> Comments { get; set; } = new List<Comment>();
-        // the friends of the currently logged in user user1
-        public ICollection<Friendships> UserFriendships { get; set; } = new List<Friendships>();
+        public ICollection<Friends> Friends { get; set; } = new List<Friends>();
 
-        // one user can join multiple groups and be a Group member
-        public ICollection<GroupMembers> GroupMember { get; set; } = new List<GroupMembers>();
+        public ICollection<GroupMembers> GroupMembers { get; set; } = new List<GroupMembers>();
 
-        // one user can create multiple groups
-        public ICollection<Group> CreatedGroups { get; set; } = new List<Group>();
+        public ICollection<Group> Groups { get; set; } = new List<Group>();
     }
 }

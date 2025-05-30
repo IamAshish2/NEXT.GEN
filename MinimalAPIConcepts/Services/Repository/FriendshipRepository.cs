@@ -16,7 +16,7 @@ namespace NEXT.GEN.Services.Repository
         {
             _context = context;
         }
-        public async Task<bool> AddFriend(Friendships newFriend)
+        public async Task<bool> AddFriend(Friends newFriend)
         {
             await _context.Friends.AddAsync(newFriend);
             return await Save();
@@ -34,13 +34,13 @@ namespace NEXT.GEN.Services.Repository
             return false;
         }
 
-        public async Task<Friendships> GetFriendship(string requestedUserId, string requestorUserId)
+        public async Task<Friends> GetFriendship(string requestedUserId, string requestorUserId)
         {
             return await _context.Friends.Where(f => f.UserId == requestedUserId && f.FriendId == requestorUserId).FirstOrDefaultAsync();
         }
 
         // what am i gonna do with get all friendships?
-        public async Task<ActionResult<ICollection<Friendships>>> GetAllFriendships()
+        public async Task<ActionResult<ICollection<Friends>>> GetAllFriendships()
         {
             return  await _context.Friends.OrderBy(f => f.FriendshipId).ToListAsync();
         }
@@ -67,7 +67,7 @@ namespace NEXT.GEN.Services.Repository
             return  friends;
         }
 
-        public async Task<bool> RemoveFriend(Friendships friend)
+        public async Task<bool> RemoveFriend(Friends friend)
         {   
              _context.Friends.Remove(friend);
             return await Save();

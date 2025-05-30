@@ -8,7 +8,7 @@ namespace NEXT.GEN.Models
     // this table represents the friends the user can have
     // the intermediate table between users and users | one user can have many friends who are other users (self refrencing relationship)
     //[Index(nameof(UserId), nameof(FriendId), IsUnique = true)]
-    public class Friendships
+    public class Friends
     {
         [Key]
         public int FriendshipId { get; set; }
