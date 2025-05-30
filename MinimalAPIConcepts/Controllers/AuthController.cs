@@ -1,29 +1,26 @@
-﻿using AutoMapper;
-using global::NEXT.GEN.global;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Google;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
-using MinimalAPIConcepts.Dtos.UserDto;
-using NEXT.GEN.Context;
-using NEXT.GEN.Dtos.Otp;
-using NEXT.GEN.ExceptionHandlers;
-using NEXT.GEN.Models;
-using NEXT.GEN.Services.Interfaces;
-
-namespace MinimalAPIConcepts.Controllers
+﻿namespace NEXT.GEN.Controllers
 {
+    using AutoMapper;
+    using Microsoft.AspNetCore.Authentication;
+    using Microsoft.AspNetCore.Authentication.Google;
+    using Microsoft.AspNetCore.Authorization;
+    using Microsoft.AspNetCore.Identity;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.EntityFrameworkCore;
+    using Microsoft.Extensions.Options;
+    using MinimalAPIConcepts.Dtos.UserDto;
+    using NEXT.GEN.Context;
+    using NEXT.GEN.Dtos.Otp;
+    using NEXT.GEN.ExceptionHandlers;
+    using NEXT.GEN.global;
+    using NEXT.GEN.Models;
+    using NEXT.GEN.Services.Interfaces;
+
     [Route("api/[controller]")]
     [ApiController]
-    public class AuthController : ControllerBase    
+    public class AuthController : ControllerBase
     {
-        
         private readonly ApplicationDbContext _context;
-        private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ITokenGenerator _tokenGenerator;
         private readonly IUserRepository _userRepository;
@@ -33,13 +30,14 @@ namespace MinimalAPIConcepts.Controllers
         private readonly ILogger<AuthController> _logger;
         private readonly JwtSettings _jwtSettings;
 
-        public AuthController(ApplicationDbContext context, IMapper mapper ,IHttpContextAccessor  httpContextAccessor ,
+        public AuthController(
+            ApplicationDbContext context, IMapper mapper ,IHttpContextAccessor  httpContextAccessor ,
             ITokenGenerator tokenGenerator, IOptions<JwtSettings> jwtSettings, IUserRepository userRepository,
             IOtpRepository otpRepository, IEmailService emailService, IWebHostEnvironment environment,
-            ILogger<AuthController> logger)
+            ILogger<AuthController> logger
+            )
         {
             _context = context;
-            _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
             _tokenGenerator = tokenGenerator;
             _userRepository = userRepository;
@@ -51,7 +49,7 @@ namespace MinimalAPIConcepts.Controllers
         }
 
         [HttpGet]
-        //[Authorize]
+        [Authorize]
         // This endpoint can only be hit by the authorized user i.e. admin in this case. 
         // so, if the endpoint returns 200 ok , the user is authorized
         // else the user is not authorized.
@@ -105,6 +103,7 @@ namespace MinimalAPIConcepts.Controllers
                     SameSite = SameSiteMode.None,
                     Expires = DateTime.UtcNow.AddMinutes(Convert.ToInt32(_jwtSettings.ExpireMinutes))
                 };
+                
                 Response.Cookies.Append("auth_token", token, cookieOptions);
                 Response.Cookies.Append("userName",user.UserName,cookieOptions);
                 Response.Cookies.Append("userId", user.Id,cookieOptions);
@@ -114,7 +113,6 @@ namespace MinimalAPIConcepts.Controllers
                 return Ok(new
                 {
                     message = "Login successful",
-                    userName = loginUser.UserName
                 });
             }
             catch (Exception Error)

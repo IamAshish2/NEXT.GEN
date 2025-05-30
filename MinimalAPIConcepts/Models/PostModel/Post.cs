@@ -8,9 +8,9 @@ namespace NEXT.GEN.Models.PostModel
         [Key]
         public int PostId { get; set; }
 
-        [Required]
+        [Required,MaxLength(150)]
         public string Title { get; set; }
-        [Required]
+        [Required,MaxLength(400)]
         public string Description { get; set; }
         public DateTime PostedDate { get; set; }
         public List<string> ImageUrls { get; set; } = new List<string>();

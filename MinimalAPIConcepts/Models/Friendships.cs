@@ -15,6 +15,7 @@ namespace NEXT.GEN.Models
         // the curent user
         //public string UserName { get; set; }
         //[ForeignKey("UserName")]
+        //[MaxLength(20), Required]
         public string UserId { get; set; }
         [ForeignKey("UserId")]
         // navigation property for the first user

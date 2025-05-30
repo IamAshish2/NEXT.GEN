@@ -1,13 +1,12 @@
-﻿using NEXT.GEN.Models;
-
-namespace NEXT.GEN.Services.HTTPONLY_MIDDLEWARE
+﻿namespace NEXT.GEN.Services.HTTPONLY_MIDDLEWARE
 {
+    using System.IdentityModel.Tokens.Jwt;
+    using System.Security.Claims;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.Options;
-    using System.IdentityModel.Tokens.Jwt;
     using Microsoft.IdentityModel.Tokens;
-    using System.Security.Claims;
+    using NEXT.GEN.Models;
 
     public class JwtMiddleware
     {

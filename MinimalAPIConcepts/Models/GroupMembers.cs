@@ -6,12 +6,13 @@ namespace NEXT.GEN.Models
 {
     public class GroupMembers
     {
-        [Key]
+        [Key,Required]
         public int GroupMemberId { get; set; }
         public DateTime JoinDate { get; set; }
         //public string UserName { get; set; }
         //[ForeignKey("UserName")]
 
+        [Required, StringLength(450)]
         public string MemberId { get; set; }
         [ForeignKey("MemberId")]
         public User User { get; set; }

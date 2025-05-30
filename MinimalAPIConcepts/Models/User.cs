@@ -6,19 +6,23 @@ namespace NEXT.GEN.Models
 {
     public class User : IdentityUser
     {
+        [MaxLength(100)]
         public string? FullName { get; set; }
 
-        [Required, EmailAddress]
-        //public string? Email { get; set; }
+        [Required, EmailAddress, MaxLength(256)]
+        public override string? Email { get; set; }
 
-        //[Required]
+        [Required, MaxLength(100)]
         public string Password { get; set; } = string.Empty!;
 
-        // some user details
-        public string? Bio {  get; set; }
-        // the course the student is studying
+        [MaxLength(500)]
+        public string? Bio { get; set; }
+
+        [MaxLength(100)]
         public string? Course { get; set; }
-        public string? Address {  get; set; }
+
+        [MaxLength(200)]
+        public string? Address { get; set; }
         public ICollection<string>? Socials { get; set; } = new List<string>();
         public ICollection<string>? Skills { get; set; } = new List<string>();
 
