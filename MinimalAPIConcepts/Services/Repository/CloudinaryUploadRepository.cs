@@ -29,37 +29,23 @@ public class CloudinaryUploadRepository : ICloudinaryUploadRepository
 
     public async Task<ProfilePicture> UploadUserProfileToCloudinary(string userId, PhotoForCreationDto photoDto)
     {
-        var file = photoDto.File;
-        
-        var uploadResult = new ImageUploadResult();
-        
-        if (file.Length > 0)
-        {
-            var stream = file.OpenReadStream();
-        
-            var uploadParams = new ImageUploadParams()
-            {
-                File = new FileDescription(file.Name, stream)
-            };
-        
-            uploadResult = await _cloudinary.UploadAsync(uploadParams);
-        }
+        var uploadResult = await UploadToCloudinary(photoDto);
 
-        // var uploadResult = await UploadToCloudinary(photoDto);
         photoDto.Url = uploadResult.Url.ToString();
-        photoDto.PublicId = uploadResult.PublicId.ToString();
+        photoDto.PublicId = uploadResult.PublicId;
 
         var photo = new ProfilePicture()
         {
             Url = photoDto.Url,
-            Description = "",
             DateAdded = photoDto.DateAdded,
             PublicId = photoDto.PublicId,
-            UserId = userId
+            UserId = userId,
+            Description = ""
         };
 
         photo.IsMain = true;
         return photo;
+
     }
 
     private async Task<ImageUploadResult> UploadToCloudinary(PhotoForCreationDto photoDto)

@@ -36,7 +36,8 @@ namespace NEXT.GEN.Services.Repository
 
             // get the total number of groups
             var count = await _context.Groups.CountAsync();
-           /* how Math.Ceiling works and why we used double
+           /*
+            how Math.Ceiling works and why we used double
             count = 53
             pageSize = 10
             count / pageSize = 5.3
