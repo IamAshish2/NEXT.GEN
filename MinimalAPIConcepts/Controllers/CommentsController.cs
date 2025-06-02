@@ -47,7 +47,7 @@ namespace NEXT.GEN.Controllers
             }
 
             var mappedComment = _mapper.Map<Comment>(comment);
-            mappedComment.UserId = userId;
+            //mappedComment.UserId = "747a3de8-777d-45be-a13e-0dd6444645b3";
             mappedComment.CommentDate = DateTime.Now;
             if (!await _commentRepository.CreateComment(mappedComment))
             {

@@ -1,22 +1,23 @@
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
-using MinimalAPIConcepts.Context;
-using NEXT.GEN.Models.EmailModel;
-using NEXT.GEN.Services.Interfaces;
-using NEXT.GEN.Services.Repository;
 using System.Net;
 using System.Net.Mail;
 using System.Text;
-
+using Microsoft.AspNetCore.Authentication.Cookies;
 // google
 using Microsoft.AspNetCore.Authentication.Google;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using NEXT.GEN.Context;
 using NEXT.GEN.Models;
+using NEXT.GEN.Models.EmailModel;
+using NEXT.GEN.Services.Interfaces;
+using NEXT.GEN.Services.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddMemoryCache();
 
 
 // for resolving multiple object cycles
@@ -38,7 +39,7 @@ builder.Services.AddFluentEmail(smtp.FromEmail, smtp.FromName)
     {
         Port = smtp.Port,
         Credentials = new NetworkCredential(smtp.FromEmail, smtp.Password),
-        EnableSsl = smtp.EnableSsl,
+        EnableSsl = true,
     });
 
 // adding the cors policy for all origins default.
@@ -48,7 +49,9 @@ builder.Services.AddCors(options =>
 );
 
 // Add Jwt configuration
-//builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
+// Add smtp configuration binding
+builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("Smtp"));
 
 /* previous configuration
 builder.Services.AddAuthentication(options =>
@@ -111,13 +114,13 @@ builder.Services.AddAuthentication(options =>
     var jwtSettings = builder.Configuration.GetSection("Jwt").Get<JwtSettings>();
     options.TokenValidationParameters = new TokenValidationParameters
     {
-        ValidAudience = jwtSettings.Audience,
+        ValidAudience = jwtSettings?.Audience,
         ValidateAudience = true,
 
-        ValidIssuer = jwtSettings.Issuer,
+        ValidIssuer = jwtSettings?.Issuer,
         ValidateIssuer = true,
 
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Key)),
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings?.Key ?? "")),
         ValidateIssuerSigningKey = true,
 
         ClockSkew = TimeSpan.Zero,
@@ -152,9 +155,10 @@ builder.Services.AddAuthentication(options =>
     //options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
     //options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
 
-
-    options.ClientId = builder.Configuration["GoogleKeys:ClientId"];
-    options.ClientSecret = builder.Configuration["GoogleKeys:CLIENTSECRET"];
+    var google = builder.Configuration.GetSection("GoogleKeys");
+    
+    options.ClientId = google["ClientId"];
+    options.ClientSecret = google["ClientSecret"];
     options.SaveTokens = true;
     options.UsePkce = true; // For OAuth2 providers that support it
 });
@@ -178,16 +182,16 @@ builder.Services.AddSwaggerGen(c =>
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
         {
              {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
+                new OpenApiSecurityScheme
                 {
-                    Type=ReferenceType.SecurityScheme,
-                    Id="Bearer"
-                }
-            },
-            new string[]{}
-        }
+                    Reference = new OpenApiReference
+                    {
+                        Type=ReferenceType.SecurityScheme,
+                        Id="Bearer"
+                    },
+                },
+                new string[]{}
+             },
         });
 }
 );
@@ -200,8 +204,12 @@ builder.Services.AddControllers();
 //});
 
 // Database connection with azure sql
-var sqlConnection = builder.Configuration["ConnectionStrings:SqlDb"];
-builder.Services.AddSqlServer<ApplicationDbContext>(sqlConnection, options => options.EnableRetryOnFailure());
+//var sqlConnection = builder.Configuration["ConnectionStrings:SqlDb"];
+//builder.Services.AddSqlServer<ApplicationDbContext>(sqlConnection, options => options.EnableRetryOnFailure());
+
+// Local database connection with mssql
+var sqlConnection = builder.Configuration["ConnectionStrings:DefaultConnection"];
+builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(sqlConnection));
 
 // Dependency injection for repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -213,20 +221,21 @@ builder.Services.AddScoped<IPostRepository, PostRepository>();
 builder.Services.AddScoped<IGroupMemberRepository, GroupMemberRepository>();
 builder.Services.AddScoped<ILikeRepository, LikeRepository>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
-
+builder.Services.AddSingleton<IOtpRepository, OtpRepository>();
+builder.Services.AddScoped<IUserProfilePictureRepository, UserProfileImageRepository>();
+builder.Services.AddScoped<ICloudinaryUploadRepository, CloudinaryUploadRepository>();
 
 
 var app = builder.Build();
 
 app.UseDeveloperExceptionPage();
-
-
 app.UseCors("AllowAllOrigins");
 app.UseAuthentication();
-app.UseAuthorization();
+// app.UseAuthorization();
 app.UseHttpsRedirection();
 
 // TODO -> TRY USING THIS MIDDLEWARE EVEN BEFORE HITTING THE CONTROLLERS 
+// but the same work is being done by the authentication middleware , the token validation parameters
 //app.UseMiddleware<JwtMiddleware>();
 
 
@@ -240,9 +249,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "Minimal Api Practice v1");
-        c.RoutePrefix = string.Empty;
+        //c.RoutePrefix = string.Empty;
     });
 }
-
 
 app.Run();

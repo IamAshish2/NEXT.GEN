@@ -15,5 +15,14 @@ namespace NEXT.GEN.Models.PostModel
         [ForeignKey("PostId")]
         public CreatePost Post { get; set; }
         public DateTime CommentDate { get; set; }
+
+        // comment chaining
+        // foreign key
+        public int? ParentId { get; set; }
+        [ForeignKey("ParentId")]
+        // navigation property
+        public Comment ParentComment { get; set; }
+        public ICollection<Comment> Replies { get; set; } = new List<Comment>();
+
     }
 }

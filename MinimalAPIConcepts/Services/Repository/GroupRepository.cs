@@ -6,6 +6,7 @@ using NEXT.GEN.Services.Interfaces;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using NEXT.GEN.Context;
+using NEXT.GEN.Models.pagination;
 
 namespace NEXT.GEN.Services.Repository
 {
@@ -23,42 +24,29 @@ namespace NEXT.GEN.Services.Repository
             await _context.Groups.AddAsync(group);
             return await Save();
         }
+        
 
-        //public async Task<bool> DeleteGroup(int groupId)
-        //{
-        //    var group = await _context.Groups.FirstOrDefaultAsync(g => g.GroupId == groupId);
-        //    if (group == null)
-        //        return false;
-
-        //    _context.Groups.Remove(group);
-        //    return await Save();
-        //}
-
-
-        //public async Task<bool> DoesGroupExist(int groupId)
-        //{
-        //    return await _context.Groups.AnyAsync(g => g.GroupId == groupId);
-        //}
-
-        public async Task<ICollection<GetGroupDetailsDto>> GetAllGroups()
+        public async Task<PaginatedList<Group>> GetAllGroups(int pageIndex, int pageSize)
         {
-            return await _context.Groups.OrderByDescending(g => g.GroupName)
-                .Select(g => new GetGroupDetailsDto
-                {
-                    GroupName = g.GroupName,
-                    GroupImage = g.GroupImage,
-                    Category = g.Category,
-                    Description = g.Description,
-                    MemberCount = g.MemberCount,
-                    CreatorId = g.CreatorId,
-                })
-                .ToListAsync();
-        }
 
-        //public async Task<Group> GetGroupById(int groupId)
-        //{
-        //    return await _context.Groups.FirstOrDefaultAsync(g => g.GroupId == groupId);
-        //}
+            var groups = await _context.Groups.OrderBy(g => g.GroupName)
+                .Skip((pageIndex - 1) * pageSize ) // skip the part from before if the pageIndex is 2, it skips the first 10 data if the pageSize is 10
+                .Take(pageSize)
+                .ToListAsync();
+
+            // get the total number of groups
+            var count = await _context.Groups.CountAsync();
+           /*
+            how Math.Ceiling works and why we used double
+            count = 53
+            pageSize = 10
+            count / pageSize = 5.3
+            totalPages = Math.Ceiling(5.3) = 6
+            */
+            var totalPages = (int) Math.Ceiling(count / (double) pageSize);
+
+            return new PaginatedList<Group>(groups, pageIndex, totalPages, count);
+        }
 
         public async Task<bool> UpdateGroup(Group group)
         {
@@ -89,7 +77,6 @@ namespace NEXT.GEN.Services.Repository
         public async Task<GetGroupDetailsDto> GetGroupByName(string groupName)
         {
             return await _context.Groups.Where(g => g.GroupName == groupName)
-                //.Select(g => g.Members.HasJoi)
                 .Select(g => new GetGroupDetailsDto
                 {
                     GroupName = g.GroupName,

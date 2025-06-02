@@ -8,13 +8,16 @@ namespace NEXT.GEN.Models
     {
         //public int GroupId { get; set; }
         // make groupName the primary key
-        [Key]
+        [Key,Required,MaxLength(40)]
         public string GroupName { get; set; }
         public int MemberCount { get; set; } = 0;
+        [MaxLength(100)]
         public string Description { get; set; }
         // the creator of the group 
+        [MaxLength(50)]
         public string Category { get; set; }
-        public string GroupImage { get; set; }
+        
+        public string? GroupImage { get; set; }
         // for checking if the user has joined the  given group
         //public bool HasJoined { get; set; }
         //public string CreatorName { get; set; }

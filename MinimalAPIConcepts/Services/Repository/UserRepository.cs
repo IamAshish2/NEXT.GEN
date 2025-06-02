@@ -74,8 +74,8 @@ namespace NEXT.GEN.Services.Repository
                     Stats = new UserStatsResponseDto
                     {
                         Posts = u.Posts.Count(u => u.CreatorId == userId),
-                        Groups = u.GroupMember.Count(u => u.MemberId == userId),
-                        Connections = u.UserFriendships.Count(u => u.UserId == userId)
+                        Groups = u.GroupMembers.Count(u => u.MemberId == userId),
+                        Connections = u.Friends.Count(u => u.UserId == userId)
                     }
                 }).FirstOrDefaultAsync();
                 ;

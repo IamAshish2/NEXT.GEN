@@ -9,5 +9,8 @@ namespace NEXT.GEN.Dtos.CommentDto
         //public string UserName { get; set; }
         public int PostId { get; set; }
         public DateTime? CommentDate { get; set; }
+        // if the ParentId is 0, it means it is the top level comment
+        // else it is a reply to a parent comment
+        public int? ParentId { get; set; }
     }
 }

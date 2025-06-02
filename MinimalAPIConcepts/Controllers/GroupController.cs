@@ -1,14 +1,14 @@
 ﻿using AutoMapper;
-using Azure.Core;
 using Microsoft.AspNetCore.Mvc;
 using NEXT.GEN.Dtos.GroupDto;
 using NEXT.GEN.Dtos.PostDto;
 using NEXT.GEN.Models;
+using NEXT.GEN.Models.pagination;
 using NEXT.GEN.Models.PostModel;
 using NEXT.GEN.Services.Interfaces;
 
 // This controller handles the actions performed for a group
-// handling group memebers joining and leaving is handled by the group member entity
+// handling group members joining and leaving is handled by the group member entity
 
 
 namespace NEXT.GEN.Controllers
@@ -32,11 +32,11 @@ namespace NEXT.GEN.Controllers
 
         // GET: api/groups
         [HttpGet("get-all-groups")]
-        public async Task<ActionResult<ICollection<GetGroupDetailsDto>>> GetAllGroups()
+        public async Task<ActionResult<PaginatedList<Group>>> GetAllGroups(int pageIndex, int rowsPerPage )
         {
             try
             {
-                var groups = await _groupRepository.GetAllGroups();
+                var groups = await _groupRepository.GetAllGroups(pageIndex, rowsPerPage);
                 
                 if(groups == null)
                 {
