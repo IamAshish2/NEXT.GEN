@@ -1,8 +1,8 @@
-﻿using NEXT.GEN.Models.PostModel;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using NEXT.GEN.Models.UserModel.PostModel;
 
-namespace NEXT.GEN.Models
+namespace NEXT.GEN.Models.UserModel
 {
     public class Group
     {

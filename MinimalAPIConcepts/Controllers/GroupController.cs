@@ -2,9 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using NEXT.GEN.Dtos.GroupDto;
 using NEXT.GEN.Dtos.PostDto;
-using NEXT.GEN.Models;
-using NEXT.GEN.Models.pagination;
-using NEXT.GEN.Models.PostModel;
+using NEXT.GEN.Models.UserModel;
+using NEXT.GEN.Models.UserModel.pagination;
+using NEXT.GEN.Models.UserModel.PostModel;
 using NEXT.GEN.Services.Interfaces;
 
 // This controller handles the actions performed for a group
@@ -123,12 +123,14 @@ namespace NEXT.GEN.Controllers
                 //    //Members = new List<GroupMembers> { new GroupMembers { UserId = createGroupDto.CreatorId} }
                 //};
 
+                //
+                // Request.Cookies.TryGetValue("userId", out var userId);
+                // if (String.IsNullOrEmpty(userId))
+                // {
+                //     return BadRequest();
+                // }
 
-                Request.Cookies.TryGetValue("userId", out var userId);
-                if (String.IsNullOrEmpty(userId))
-                {
-                    return BadRequest();
-                }
+                string userId = "7d1213dd-038d-497b-9f4f-fa7b05c8278a";
 
 
                 var group = _mapper.Map<Group>(createGroupDto);
@@ -261,6 +263,30 @@ namespace NEXT.GEN.Controllers
             }
 
             return NoContent();
+        }
+
+
+        [HttpGet("search-group")]
+        [ProducesResponseType(500)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(401)]
+        public async Task<ActionResult<GetGroupDetailsDto?>> SearchGroup([FromQuery] string groupName, string userId)
+        {
+            // check if the group with the searched groupName exists
+            if (!await _groupRepository.DoesGroupExist(groupName) || string.IsNullOrWhiteSpace(groupName))
+            {
+                return NotFound();
+            }
+
+            var groupDetails = await _groupRepository.GetGroupDetailsByName(groupName, userId);
+            
+            if (groupDetails == null)
+            {
+                return NotFound();
+            }
+
+            
+            return groupDetails;
         }
     }
 }

@@ -3,7 +3,7 @@ using Microsoft.Identity.Client;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace NEXT.GEN.Models
+namespace NEXT.GEN.Models.UserModel
 {
     // this table represents the friends the user can have
     // the intermediate table between users and users | one user can have many friends who are other users (self refrencing relationship)

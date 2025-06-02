@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace NEXT.GEN.Models
+namespace NEXT.GEN.Models.UserModel
 {
     public class RefreshToken
     {

@@ -1,4 +1,4 @@
-﻿namespace NEXT.GEN.Models.pagination;
+﻿namespace NEXT.GEN.Models.UserModel.pagination;
 
 public class PaginatedList<T>
 {

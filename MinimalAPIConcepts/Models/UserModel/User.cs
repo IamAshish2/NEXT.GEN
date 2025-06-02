@@ -1,8 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections;
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Identity;
-using NEXT.GEN.Models.PostModel;
+using NEXT.GEN.Models.Courses;
+using NEXT.GEN.Models.UserModel.PostModel;
 
-namespace NEXT.GEN.Models
+namespace NEXT.GEN.Models.UserModel
 {
     public class User : IdentityUser
     {
@@ -30,6 +32,8 @@ namespace NEXT.GEN.Models
         public ICollection<Dislike> Dislikes { get; set; } = new List<Dislike>();
         public ICollection<Comment> Comments { get; set; } = new List<Comment>();
         public ICollection<Friends> Friends { get; set; } = new List<Friends>();
+        public ICollection<Course> UploadedCourses { get; set; } = new List<Course>();
+        public ICollection<Enrollment> Enrollments { get; set; } = new List<Enrollment>();
 
         public ICollection<GroupMembers> GroupMembers { get; set; } = new List<GroupMembers>();
 

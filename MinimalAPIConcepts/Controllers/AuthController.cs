@@ -13,7 +13,7 @@
     using NEXT.GEN.Dtos.Otp;
     using NEXT.GEN.ExceptionHandlers;
     using NEXT.GEN.global;
-    using NEXT.GEN.Models;
+    using Models.UserModel;
     using NEXT.GEN.Services.Interfaces;
 
     [Route("api/[controller]")]

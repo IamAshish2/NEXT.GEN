@@ -1,4 +1,4 @@
-﻿namespace NEXT.GEN.Models
+﻿namespace NEXT.GEN.Models.UserModel
 {
     public class JwtSettings
     { 

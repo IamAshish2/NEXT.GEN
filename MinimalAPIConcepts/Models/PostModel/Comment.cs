@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace NEXT.GEN.Models.PostModel
+namespace NEXT.GEN.Models.UserModel.PostModel
 {
     public class Comment
     {

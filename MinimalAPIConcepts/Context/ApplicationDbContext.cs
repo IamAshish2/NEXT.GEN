@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using NEXT.GEN.Models;
-using NEXT.GEN.Models.PostModel;
+using NEXT.GEN.Models.Courses;
+using NEXT.GEN.Models.UserModel;
+using NEXT.GEN.Models.UserModel.PostModel;
 
 namespace NEXT.GEN.Context
 {
@@ -120,6 +121,29 @@ namespace NEXT.GEN.Context
                 .HasOne(p => p.User)
                 .WithMany(u => u.Posts)
                 .HasForeignKey(p => p.CreatorId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+
+            modelBuilder.Entity<Course>().HasKey(c => c.CourseId);
+            modelBuilder.Entity<Course>()
+                .HasOne<User>()                   // Each Course has one User (the uploader)
+                .WithMany(u => u.UploadedCourses) // Each User can upload many Courses
+                .HasForeignKey(p => p.UploadedBy) // The FK in Course is "UploadedBy" (probably a UserId)
+                .OnDelete(DeleteBehavior.Cascade); // If a User is deleted, delete their uploaded courses
+
+            modelBuilder.Entity<Enrollment>()
+                .HasKey(e => new { e.UserId, e.CourseId });
+            
+            modelBuilder.Entity<Enrollment>()
+                .HasOne(e => e.User)
+                .WithMany(u => u.Enrollments)
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Enrollment>()
+                .HasOne(e => e.Course)
+                .WithMany(c => c.Enrollments)
+                .HasForeignKey(e => e.CourseId)
                 .OnDelete(DeleteBehavior.NoAction);
         }
     }

@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NEXT.GEN.Dtos.LikeDto;
-using NEXT.GEN.Models.PostModel;
+using NEXT.GEN.Models.UserModel.PostModel;
 using NEXT.GEN.Services.Interfaces;
 
 namespace NEXT.GEN.Controllers

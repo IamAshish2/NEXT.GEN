@@ -4,7 +4,7 @@ using NEXT.GEN.Services.Interfaces;
 using AutoMapper;
 using NEXT.GEN.ExceptionHandlers;
 using NEXT.GEN.global.EmailTemplates;
-using User = NEXT.GEN.Models.User;
+using User = NEXT.GEN.Models.UserModel.User;
 
 namespace NEXT.GEN.Controllers
 {

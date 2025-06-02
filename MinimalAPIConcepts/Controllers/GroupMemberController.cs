@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using NEXT.GEN.Dtos.GroupDto;
 using NEXT.GEN.Dtos.GroupMembersDto;
-using NEXT.GEN.Models;
+using NEXT.GEN.Models.UserModel;
 using NEXT.GEN.Services.Interfaces;
 
 namespace NEXT.GEN.Controllers

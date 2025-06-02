@@ -1,6 +1,6 @@
 ﻿using Microsoft.Graph.TermStore;
 
-namespace NEXT.GEN.Models.Cloudinary;
+namespace NEXT.GEN.Models.UserModel.Cloudinary;
 
 public class CloudinarySettings
 {

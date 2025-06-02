@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using NEXT.GEN.Dtos.CommentDto;
-using NEXT.GEN.Models.PostModel;
+using NEXT.GEN.Models.UserModel.PostModel;
 using NEXT.GEN.Services.Interfaces;
 using System;
 

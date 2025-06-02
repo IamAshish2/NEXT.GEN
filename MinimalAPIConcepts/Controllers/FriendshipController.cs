@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NEXT.GEN.Dtos.FriendshipDto;
-using NEXT.GEN.Models;
+using NEXT.GEN.Models.UserModel;
 using NEXT.GEN.Services.Interfaces;
 
 namespace NEXT.GEN.Controllers

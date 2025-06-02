@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
-namespace NEXT.GEN.Models
+namespace NEXT.GEN.Models.UserModel
 {
     public class GroupMembers
     {

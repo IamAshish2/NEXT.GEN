@@ -1,4 +1,4 @@
-﻿namespace NEXT.GEN.Models.EmailModel
+﻿namespace NEXT.GEN.Models.UserModel.EmailModel
 {
     public class SmtpSettings
     {
